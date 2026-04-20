@@ -13,17 +13,9 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    dtCreated: {
-      type: DataTypes.DATE,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-    },
-    dtUpdated: {
-      type: DataTypes.DATE,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-    },
   }, {
     tableName: 'improvements',
-    timestamps: false,
+    timestamps: true,
   });
 
   return Improvement;

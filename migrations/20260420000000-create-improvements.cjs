@@ -18,12 +18,14 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
-      dtCreated: {
+      createdAt: {
         type: Sequelize.DATE,
+        allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      dtUpdated: {
+      updatedAt: {
         type: Sequelize.DATE,
+        allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
