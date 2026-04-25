@@ -1,0 +1,1 @@
+export const ADD_COMMAND_NAME = 'add'

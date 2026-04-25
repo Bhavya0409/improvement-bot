@@ -1,32 +1,22 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import {REST, Routes} from "discord.js";
+import {CONFIG} from "../config.js";
+import {ADD_COMMAND_NAME} from "./commandNames.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Add Command
+import {addNewTask, addCommand} from './addCommand.js'
 
-const commands = new Map();
+const COMMANDS = [
+	addCommand
+]
 
-async function loadCommands() {
-	const files = fs
-		.readdirSync(__dirname)
-		.filter(file => {
-			return (
-				file.indexOf('.') !== 0 &&
-				file !== 'index.js' &&
-				file.slice(-3) === '.js'
-			);
-		});
-
-	for (const file of files) {
-		const modulePath = path.join(__dirname, file);
-		const commandModule = await import(`file://${modulePath}?t=${Date.now()}`);
-		const command = commandModule.default;
-		commands.set(command.data.name, command);
-	}
+export const COMMAND_EXECUTIONS = {
+	[ADD_COMMAND_NAME]: addNewTask
 }
 
-await loadCommands();
-
-export default commands;
-
+export const registerCommands = async () => {
+	const rest = new REST({ version: '10' }).setToken(CONFIG.BOT_TOKEN);
+	await rest.put(
+		Routes.applicationGuildCommands(CONFIG.CLIENT_ID, CONFIG.GUILD_ID),
+		{ body: COMMANDS.map(command => command.toJSON()) }
+	);
+}
