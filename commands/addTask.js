@@ -1,9 +1,9 @@
 import {SlashCommandBuilder} from "discord.js";
 import {Improvement} from "../db/models/index.js";
-import {ADD_COMMAND_NAME} from "./commandNames.js";
+import {ADD_TASK} from "./commandNames.js";
 
-const addCommand = new SlashCommandBuilder()
-	.setName(ADD_COMMAND_NAME)
+const addTaskCommand = new SlashCommandBuilder()
+	.setName(ADD_TASK)
 	.setDescription('Add a new task to your improvements list')
 	.addStringOption(option =>
 		option
@@ -14,7 +14,7 @@ const addCommand = new SlashCommandBuilder()
 	)
 
 
-const addNewTask =  async (interaction) => {
+const addTask =  async (interaction) => {
 	try {
 		const taskDescription = interaction.options.getString('task').trim();
 		
@@ -47,6 +47,6 @@ const addNewTask =  async (interaction) => {
 }
 
 export {
-	addCommand,
-	addNewTask
+	addTaskCommand,
+	addTask
 }

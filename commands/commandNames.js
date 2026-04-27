@@ -1,1 +1,2 @@
-export const ADD_COMMAND_NAME = 'add'
+export const ADD_TASK = 'add'
+export const COMPLETE_TASK = 'complete'

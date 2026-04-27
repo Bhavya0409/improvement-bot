@@ -1,16 +1,21 @@
 import {REST, Routes} from "discord.js";
 import {CONFIG} from "../config.js";
-import {ADD_COMMAND_NAME} from "./commandNames.js";
+import {ADD_TASK, COMPLETE_TASK} from "./commandNames.js";
 
 // Add Command
-import {addNewTask, addCommand} from './addCommand.js'
+import {addTask, addTaskCommand} from './addTask.js'
+
+// Complete Task Command
+import {completeTask, completeTaskCommand} from './completeTask.js'
 
 const COMMANDS = [
-	addCommand
+	addTaskCommand,
+	completeTaskCommand
 ]
 
 export const COMMAND_EXECUTIONS = {
-	[ADD_COMMAND_NAME]: addNewTask
+	[ADD_TASK]: addTask,
+	[COMPLETE_TASK]: completeTask
 }
 
 export const registerCommands = async () => {
