@@ -17,6 +17,11 @@ export default (sequelize) => {
 			type: DataTypes.BOOLEAN,
 			defaultValue: false,
 		},
+		completedAt: {
+			type: DataTypes.DATE,
+			allowNull: true,
+			defaultValue: null,
+		},
 	}, {
 		sequelize,
 		modelName: 'Improvement',
