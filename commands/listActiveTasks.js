@@ -1,6 +1,7 @@
 import {SlashCommandBuilder, EmbedBuilder} from "discord.js";
 import {Improvement} from "../db/models/index.js";
 import {LIST_ACTIVE_TASKS} from "./commandNames.js";
+import {calculateAge, capitalizeFirstLetter} from "../utils.js";
 
 const listActiveTasksCommand = new SlashCommandBuilder()
 	.setName(LIST_ACTIVE_TASKS)
@@ -24,27 +25,6 @@ const listActiveTasks = async (interaction) => {
 				ephemeral: false,
 			});
 		}
-
-		// Helper function to calculate age of task
-		const calculateAge = (createdAt) => {
-			const now = new Date();
-			const created = new Date(createdAt);
-			const diffInMilliseconds = now - created;
-			const diffInHours = diffInMilliseconds / (1000 * 60 * 60);
-			const diffInDays = Math.floor(diffInHours / 24);
-
-			if (diffInHours < 24) {
-				return '<1 day ago';
-			}
-
-			// Use singular or plural
-			return diffInDays === 1 ? '1 day ago' : `${diffInDays} days ago`;
-		};
-
-		// Helper function to capitalize first letter
-		const capitalizeFirstLetter = (str) => {
-			return str.charAt(0).toUpperCase() + str.slice(1);
-		};
 
 		// Build the three columns for the embed
 		const ids = tasks.map(task => task.id.toString()).join('\n');
