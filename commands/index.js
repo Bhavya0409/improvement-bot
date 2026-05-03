@@ -1,6 +1,6 @@
 import {REST, Routes} from "discord.js";
 import {CONFIG} from "../config.js";
-import {ADD_TASK, COMPLETE_TASK, LIST_ACTIVE_TASKS} from "./commandNames.js";
+import {ADD_TASK, COMPLETE_TASK, LIST_ACTIVE_TASKS, RANDOM} from "./commandNames.js";
 
 // Add Command
 import {addTask, addTaskCommand} from './addTask.js'
@@ -11,16 +11,21 @@ import {completeTask, completeTaskCommand} from './completeTask.js'
 // List Active Tasks Command
 import {listActiveTasks, listActiveTasksCommand} from './listActiveTasks.js'
 
+// Random Task Command
+import {randomTask, randomTaskCommand} from './randomTask.js'
+
 const COMMANDS = [
 	addTaskCommand,
 	completeTaskCommand,
-	listActiveTasksCommand
+	listActiveTasksCommand,
+	randomTaskCommand
 ]
 
 export const COMMAND_EXECUTIONS = {
 	[ADD_TASK]: addTask,
 	[COMPLETE_TASK]: completeTask,
-	[LIST_ACTIVE_TASKS]: listActiveTasks
+	[LIST_ACTIVE_TASKS]: listActiveTasks,
+	[RANDOM]: randomTask
 }
 
 export const registerCommands = async () => {
