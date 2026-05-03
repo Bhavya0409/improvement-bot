@@ -1,7 +1,7 @@
 import {SlashCommandBuilder, EmbedBuilder} from "discord.js";
 import {Improvement} from "../db/models/index.js";
 import {ADD_TASK} from "./commandNames.js";
-import {calculateAge, capitalizeFirstLetter} from "../utils.js";
+import {getAgeWithColor, capitalizeFirstLetter} from "../utils.js";
 
 const addTaskCommand = new SlashCommandBuilder()
 	.setName(ADD_TASK)
@@ -55,15 +55,15 @@ const addTask =  async (interaction) => {
 		// Build embed with all active tasks
 		const ids = allTasks.map(task => task.id.toString()).join('\n');
 		const taskDescriptions = allTasks.map(task => capitalizeFirstLetter(task.value)).join('\n');
-		const ages = allTasks.map(task => calculateAge(task.createdAt)).join('\n');
+		const ages = allTasks.map(task => getAgeWithColor(task.createdAt)).join('\n');
 		
 		const embed = new EmbedBuilder()
 			.setColor('#FFA500')
 			.setTitle(`⏳ ACTIVE TASKS (${allTasks.length})`)
 			.addFields(
+				{ name: 'Age', value: ages, inline: true },
 				{ name: 'ID', value: ids, inline: true },
-				{ name: 'Task', value: taskDescriptions, inline: true },
-				{ name: 'Age', value: ages, inline: true }
+				{ name: 'Task', value: taskDescriptions, inline: true }
 			)
 			.setFooter({ text: `Total active tasks: ${allTasks.length}` });
 		

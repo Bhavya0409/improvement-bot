@@ -1,7 +1,7 @@
 import {SlashCommandBuilder, EmbedBuilder} from "discord.js";
 import {Improvement} from "../db/models/index.js";
 import {COMPLETE_TASK} from "./commandNames.js";
-import {calculateAge, capitalizeFirstLetter} from "../utils.js";
+import {getAgeWithColor, capitalizeFirstLetter} from "../utils.js";
 
 const completeTaskCommand = new SlashCommandBuilder()
 	.setName(COMPLETE_TASK)
@@ -87,15 +87,15 @@ const completeTask = async (interaction) => {
 		// Build embed with remaining tasks
 		const ids = remainingTasks.map(task => task.id.toString()).join('\n');
 		const taskDescriptions = remainingTasks.map(task => capitalizeFirstLetter(task.value)).join('\n');
-		const ages = remainingTasks.map(task => calculateAge(task.createdAt)).join('\n');
+		const ages = remainingTasks.map(task => getAgeWithColor(task.createdAt)).join('\n');
 		
 		const embed = new EmbedBuilder()
 			.setColor('#FFA500')
 			.setTitle(`⏳ REMAINING ACTIVE TASKS (${remainingTasks.length})`)
 			.addFields(
+				{ name: 'Age', value: ages, inline: true },
 				{ name: 'ID', value: ids, inline: true },
-				{ name: 'Task', value: taskDescriptions, inline: true },
-				{ name: 'Age', value: ages, inline: true }
+				{ name: 'Task', value: taskDescriptions, inline: true }
 			)
 			.setFooter({ text: `Total active tasks: ${remainingTasks.length}` });
 		
