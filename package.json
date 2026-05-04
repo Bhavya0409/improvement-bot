@@ -4,6 +4,7 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon main.js",
     "migrate": "npx sequelize-cli db:migrate",
     "rollback": "npx sequelize-cli db:migrate:undo"
   },
@@ -20,6 +21,7 @@
     "sequelize": "^6.37.8"
   },
   "devDependencies": {
+    "nodemon": "^3.1.14",
     "sequelize-cli": "^6.6.2"
   }
 }

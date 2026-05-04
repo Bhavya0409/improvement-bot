@@ -27,6 +27,20 @@ const addTask =  async (interaction) => {
 			});
 		}
 		
+		// Check if a task with the same description already exists (non-completed)
+		const existingTask = await Improvement.findOne({
+			where: {
+				value: taskDescription,
+				completed: false
+			}
+		});
+		
+		if (existingTask) {
+			return await interaction.editReply({
+				content: '❌ A task with this description already exists.',
+			});
+		}
+		
 		// Create the improvement record
 		const improvement = await Improvement.create({
 			value: taskDescription,

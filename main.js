@@ -17,7 +17,7 @@ CLIENT.once(Events.ClientReady, async (client) => {
 CLIENT.on(Events.InteractionCreate, async (interaction) => {
 	if (!interaction.isAutocomplete()) return;
 	
-	if (interaction.commandName !== 'complete') return
+	if (interaction.commandName !== 'complete' && interaction.commandName !== 'edit') return
 	
 	const focusedValue = interaction.options.getFocused();
 	
@@ -29,18 +29,30 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 			}
 		});
 		
-		// Format suggestions as "[ID] - [Description]"
-		const filtered = tasks.map(task => ({
-			name: `${task.id} - ${task.value}`,
-			value: `${task.id} - ${task.value}`
-		})).filter(choice =>
+		// Format suggestions based on command
+		// For 'complete' command: include ID prefix
+		// For 'edit' command: only task descriptions
+		const filtered = tasks.map(task => {
+			if (interaction.commandName === 'complete') {
+				return {
+					name: `${task.id} - ${task.value}`,
+					value: `${task.id} - ${task.value}`
+				};
+			} else {
+				// edit command - descriptions only
+				return {
+					name: task.value,
+					value: task.value
+				};
+			}
+		}).filter(choice =>
 			choice.name.toLowerCase().includes(focusedValue.toLowerCase())
 		);
 		
 		// Return up to 25 results
 		await interaction.respond(filtered.slice(0, 25));
 	} catch (error) {
-		console.error('Error in autocomplete for complete command:', error);
+		console.error('Error in autocomplete:', error);
 		await interaction.respond([]);
 	}
 });
