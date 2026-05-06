@@ -1,3 +1,5 @@
+import {EmbedBuilder} from "discord.js";
+
 export const calculateAge = (createdAt) => {
 	const now = new Date();
 	const created = new Date(createdAt);
@@ -25,7 +27,6 @@ export const calculateAge = (createdAt) => {
 	// 1 day or more
 	return `${diffInDays}d`;
 };
-
 export const getColorCircle = (createdAt) => {
 	const now = new Date();
 	const created = new Date(createdAt);
@@ -51,7 +52,6 @@ export const getColorCircle = (createdAt) => {
 	// 🔴 7+ days
 	return '🔴';
 };
-
 export const getAgeWithColor = (createdAt) => {
 	const colorCircle = getColorCircle(createdAt);
 	const age = calculateAge(createdAt);
@@ -60,3 +60,31 @@ export const getAgeWithColor = (createdAt) => {
 export const capitalizeFirstLetter = (str) => {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 };
+export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationContent) => {
+	const ids = tasks.map(task => task.id.toString()).join('\n');
+	const taskDescriptions = tasks.map(task => capitalizeFirstLetter(task.value)).join('\n');
+	const ages = tasks.map(task => getAgeWithColor(task.createdAt)).join('\n');
+	
+	const embed = new EmbedBuilder()
+		.setColor('#FFA500')
+		.setTitle(`⏳ REMAINING ACTIVE TASKS (${tasks.length})`)
+		.addFields(
+			{ name: 'Age', value: ages, inline: true },
+			{ name: 'ID', value: ids, inline: true },
+			{ name: 'Task', value: taskDescriptions, inline: true }
+		)
+		.setFooter({ text: `Total active tasks: ${tasks.length}` });
+	
+	if (confirmationContent) {
+		await interaction.reply({
+			content: confirmationContent,
+			embeds: [embed],
+			ephemeral: false,
+		});
+	} else {
+		await interaction.reply({
+			embeds: [embed],
+			ephemeral: false,
+		});
+	}
+}

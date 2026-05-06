@@ -1,7 +1,7 @@
-import {SlashCommandBuilder, EmbedBuilder} from "discord.js";
+import {SlashCommandBuilder} from "discord.js";
 import {Improvement} from "../db/models/index.js";
 import {LIST_ACTIVE_TASKS} from "./commandNames.js";
-import {getAgeWithColor, capitalizeFirstLetter} from "../utils.js";
+import {sendRemainingTasksEmbed} from "../utils.js";
 
 const listActiveTasksCommand = new SlashCommandBuilder()
 	.setName(LIST_ACTIVE_TASKS)
@@ -25,28 +25,8 @@ const listActiveTasks = async (interaction) => {
 				ephemeral: false,
 			});
 		}
-
-		// Build the three columns for the embed
-		const ids = tasks.map(task => task.id.toString()).join('\n');
-		const taskDescriptions = tasks.map(task => capitalizeFirstLetter(task.value)).join('\n');
-		const ages = tasks.map(task => getAgeWithColor(task.createdAt)).join('\n');
-
-		// Create and configure the embed
-		const embed = new EmbedBuilder()
-			.setColor('#FFA500')
-			.setTitle(`⏳ ACTIVE TASKS (${tasks.length})`)
-			.addFields(
-				{ name: 'Age', value: ages, inline: true },
-				{ name: 'ID', value: ids, inline: true },
-				{ name: 'Task', value: taskDescriptions, inline: true },
-			)
-			.setFooter({ text: `Total active tasks: ${tasks.length}` });
-
-		// Reply with the embed
-		await interaction.reply({
-			embeds: [embed],
-			ephemeral: false,
-		});
+		
+		await sendRemainingTasksEmbed(interaction, tasks)
 
 	} catch (error) {
 		console.error('Error in list active tasks command:', error);
