@@ -2,7 +2,7 @@ import {Client, Events, GatewayIntentBits} from "discord.js";
 import {CONFIG} from "./config.js";
 import sequelize from "./db/index.js";
 import {COMMAND_EXECUTIONS, registerCommands} from "./commands/index.js";
-import {Improvement} from "./db/models/index.js";
+import {Task} from "./db/models/index.js";
 
 const CLIENT = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages],
@@ -17,23 +17,23 @@ CLIENT.once(Events.ClientReady, async (client) => {
 CLIENT.on(Events.InteractionCreate, async (interaction) => {
 	if (!interaction.isAutocomplete()) return;
 	
-	if (interaction.commandName !== 'complete' && interaction.commandName !== 'edit') return
+	if (interaction.commandName !== 'complete' && interaction.commandName !== 'edit' && interaction.commandName !== 'refresh') return
 	
 	const focusedValue = interaction.options.getFocused();
 	
 	try {
 		// Query all non-completed tasks from database
-		const tasks = await Improvement.findAll({
+		const tasks = await Task.findAll({
 			where: {
 				completed: false
 			}
 		});
 		
 		// Format suggestions based on command
-		// For 'complete' command: include ID prefix
+		// For 'complete' and 'refresh' commands: include ID prefix
 		// For 'edit' command: only task descriptions
 		const filtered = tasks.map(task => {
-			if (interaction.commandName === 'complete') {
+			if (interaction.commandName === 'complete' || interaction.commandName === 'refresh') {
 				return {
 					name: `${task.id} - ${task.value}`,
 					value: `${task.id} - ${task.value}`

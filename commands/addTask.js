@@ -1,5 +1,5 @@
 import {SlashCommandBuilder} from "discord.js";
-import {Improvement} from "../db/models/index.js";
+import {Task} from "../db/models/index.js";
 import {ADD_TASK} from "./commandNames.js";
 import {sendRemainingTasksEmbed} from "../utils.js";
 
@@ -28,7 +28,7 @@ const addTask =  async (interaction) => {
 		}
 		
 		// Check if a task with the same description already exists (non-completed)
-		const existingTask = await Improvement.findOne({
+		const existingTask = await Task.findOne({
 			where: {
 				value: taskDescription,
 				completed: false
@@ -42,13 +42,13 @@ const addTask =  async (interaction) => {
 		}
 		
 		// Create the improvement record
-		const improvement = await Improvement.create({
+		const improvement = await Task.create({
 			value: taskDescription,
 			completed: false,
 		});
 		
 		// Retrieve all non-completed tasks
-		const allTasks = await Improvement.findAll({
+		const allTasks = await Task.findAll({
 			where: {
 				completed: false
 			},

@@ -1,9 +1,13 @@
 import {EmbedBuilder} from "discord.js";
 
-export const calculateAge = (createdAt) => {
+export const calculateAge = (createdAt, lastCompletedAt) => {
+	// Prioritize lastCompletedAt if it exists
+	const referenceDate = lastCompletedAt && new Date(lastCompletedAt) > new Date(createdAt)
+		? new Date(lastCompletedAt)
+		: new Date(createdAt);
+	
 	const now = new Date();
-	const created = new Date(createdAt);
-	const diffInMilliseconds = now - created;
+	const diffInMilliseconds = now - referenceDate;
 	const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
 	const diffInMinutes = Math.floor(diffInSeconds / 60);
 	const diffInHours = Math.floor(diffInMinutes / 60);
@@ -27,10 +31,14 @@ export const calculateAge = (createdAt) => {
 	// 1 day or more
 	return `${diffInDays}d`;
 };
-export const getColorCircle = (createdAt) => {
+export const getColorCircle = (createdAt, lastCompletedAt) => {
+	// Prioritize lastCompletedAt if it exists
+	const referenceDate = lastCompletedAt && new Date(lastCompletedAt) > new Date(createdAt)
+		? new Date(lastCompletedAt)
+		: new Date(createdAt);
+	
 	const now = new Date();
-	const created = new Date(createdAt);
-	const diffInMilliseconds = now - created;
+	const diffInMilliseconds = now - referenceDate;
 	const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
 	const diffInDays = Math.floor(diffInHours / 24);
 	
@@ -52,9 +60,9 @@ export const getColorCircle = (createdAt) => {
 	// 🔴 7+ days
 	return '🔴';
 };
-export const getAgeWithColor = (createdAt) => {
-	const colorCircle = getColorCircle(createdAt);
-	const age = calculateAge(createdAt);
+export const getAgeWithColor = (createdAt, lastCompletedAt) => {
+	const colorCircle = getColorCircle(createdAt, lastCompletedAt);
+	const age = calculateAge(createdAt, lastCompletedAt);
 	return `${colorCircle} ${age}`;
 };
 export const capitalizeFirstLetter = (str) => {
@@ -63,7 +71,7 @@ export const capitalizeFirstLetter = (str) => {
 export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationContent) => {
 	const ids = tasks.map(task => task.id.toString()).join('\n');
 	const taskDescriptions = tasks.map(task => capitalizeFirstLetter(task.value)).join('\n');
-	const ages = tasks.map(task => getAgeWithColor(task.createdAt)).join('\n');
+	const ages = tasks.map(task => getAgeWithColor(task.createdAt, task.lastCompletedAt)).join('\n');
 	
 	const embed = new EmbedBuilder()
 		.setColor('#FFA500')

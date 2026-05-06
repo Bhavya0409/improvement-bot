@@ -1,5 +1,5 @@
 import {SlashCommandBuilder, EmbedBuilder} from "discord.js";
-import {Improvement} from "../db/models/index.js";
+import {Task} from "../db/models/index.js";
 import {EDIT_TASK} from "./commandNames.js";
 import {getAgeWithColor, capitalizeFirstLetter} from "../utils.js";
 
@@ -42,7 +42,7 @@ const editTask = async (interaction) => {
 		}
 		
 		// Find the task to edit by description (descriptions only, no ID prefix)
-		const improvement = await Improvement.findOne({
+		const improvement = await Task.findOne({
 			where: {
 				value: selectedTask,
 				completed: false
@@ -68,7 +68,7 @@ const editTask = async (interaction) => {
 		const confirmationContent = `✅ Task '#${improvement.id} - ${oldDescription}' has been updated to '${newDescription}'!`;
 		
 		// Retrieve remaining active tasks
-		const remainingTasks = await Improvement.findAll({
+		const remainingTasks = await Task.findAll({
 			where: {
 				completed: false
 			},
@@ -85,7 +85,7 @@ const editTask = async (interaction) => {
 		// Build embed with remaining tasks
 		const ids = remainingTasks.map(task => task.id.toString()).join('\n');
 		const taskDescriptions = remainingTasks.map(task => capitalizeFirstLetter(task.value)).join('\n');
-		const ages = remainingTasks.map(task => getAgeWithColor(task.createdAt)).join('\n');
+		const ages = remainingTasks.map(task => getAgeWithColor(task.createdAt, task.lastCompletedAt)).join('\n');
 		
 		const embed = new EmbedBuilder()
 			.setColor('#FFA500')

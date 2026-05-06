@@ -1,9 +1,9 @@
 import { DataTypes, Model } from 'sequelize';
 
 export default (sequelize) => {
-	class Improvement extends Model {}
+	class Task extends Model {}
 	
-	Improvement.init({
+	Task.init({
 		id: {
 			type: DataTypes.INTEGER,
 			primaryKey: true,
@@ -22,12 +22,18 @@ export default (sequelize) => {
 			allowNull: true,
 			defaultValue: null,
 		},
+		lastCompletedAt: {
+			type: DataTypes.DATE,
+			allowNull: true,
+			defaultValue: null,
+		},
 	}, {
 		sequelize,
-		modelName: 'Improvement',
-		tableName: 'improvements',
+		modelName: 'Task',
+		tableName: 'tasks',
 		timestamps: true,
 	});
 	
-	return Improvement;
+	return Task;
 };
+

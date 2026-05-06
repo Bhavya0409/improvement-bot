@@ -1,11 +1,11 @@
-import {SlashCommandBuilder} from "discord.js";
-import {Task} from "../db/models/index.js";
-import {COMPLETE_TASK} from "./commandNames.js";
-import {sendRemainingTasksEmbed} from "../utils.js";
+import { SlashCommandBuilder } from "discord.js";
+import { Task, Instance } from "../db/models/index.js";
+import { REFRESH } from "./commandNames.js";
+import { sendRemainingTasksEmbed } from "../utils.js";
 
-const completeTaskCommand = new SlashCommandBuilder()
-	.setName(COMPLETE_TASK)
-	.setDescription('Complete a task in your improvements list')
+const refreshTaskCommand = new SlashCommandBuilder()
+	.setName(REFRESH)
+	.setDescription('Refresh a task to reset its age')
 	.addStringOption(option =>
 		option
 			.setName('task')
@@ -14,8 +14,7 @@ const completeTaskCommand = new SlashCommandBuilder()
 			.setAutocomplete(true)
 	)
 
-
-const completeTask = async (interaction) => {
+const refreshTask = async (interaction) => {
 	try {
 		const input = interaction.options.getString('task').trim();
 		
@@ -31,11 +30,11 @@ const completeTask = async (interaction) => {
 		const idMatch = input.match(/^(\d+)/);
 		const extractedId = idMatch ? parseInt(idMatch[1]) : null;
 		
-		let improvement;
+		let task;
 		
 		// If ID was extracted, use it as source of truth
 		if (extractedId) {
-			improvement = await Task.findOne({
+			task = await Task.findOne({
 				where: {
 					id: extractedId,
 					completed: false
@@ -43,7 +42,7 @@ const completeTask = async (interaction) => {
 			});
 		} else {
 			// Otherwise try to match by description
-			improvement = await Task.findOne({
+			task = await Task.findOne({
 				where: {
 					value: input,
 					completed: false
@@ -52,21 +51,26 @@ const completeTask = async (interaction) => {
 		}
 		
 		// If task not found
-		if (!improvement) {
+		if (!task) {
 			return await interaction.reply({
 				content: `❌ No active task found with the provided input.`,
 				ephemeral: true,
 			});
 		}
 		
-		// Update the task as completed
-		await improvement.update({
-			completed: true,
+		// Create new instance record
+		await Instance.create({
+			task_id: task.id,
 			completedAt: new Date(),
 		});
 		
+		// Update the task's lastCompletedAt (but NOT completed flag)
+		await task.update({
+			lastCompletedAt: new Date(),
+		});
+		
 		// Send success reply with confirmation
-		const confirmationContent = `✅ Task '#${improvement.id} - ${improvement.value}' has been marked as completed!`;
+		const confirmationContent = `✅ Task '#${task.id} - ${task.value}' has been refreshed!`;
 		
 		// Retrieve remaining active tasks
 		const remainingTasks = await Task.findAll({
@@ -86,15 +90,16 @@ const completeTask = async (interaction) => {
 		
 		await sendRemainingTasksEmbed(interaction, remainingTasks, confirmationContent)
 	} catch (error) {
-		console.error('Error in complete command:', error);
+		console.error('Error in refresh command:', error);
 		await interaction.reply({
-			content: '❌ Failed to complete task. Please try again.',
+			content: '❌ Failed to refresh task. Please try again.',
 			ephemeral: true,
 		});
 	}
 }
 
 export {
-	completeTaskCommand,
-	completeTask
+	refreshTaskCommand,
+	refreshTask
 }
+

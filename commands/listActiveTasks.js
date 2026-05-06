@@ -1,5 +1,5 @@
 import {SlashCommandBuilder} from "discord.js";
-import {Improvement} from "../db/models/index.js";
+import {Task} from "../db/models/index.js";
 import {LIST_ACTIVE_TASKS} from "./commandNames.js";
 import {sendRemainingTasksEmbed} from "../utils.js";
 
@@ -11,7 +11,7 @@ const listActiveTasksCommand = new SlashCommandBuilder()
 const listActiveTasks = async (interaction) => {
 	try {
 		// Retrieve all non-completed tasks ordered from oldest to newest
-		const tasks = await Improvement.findAll({
+		const tasks = await Task.findAll({
 			where: {
 				completed: false
 			},

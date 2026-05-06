@@ -1,5 +1,5 @@
 import {SlashCommandBuilder, EmbedBuilder} from "discord.js";
-import {Improvement} from "../db/models/index.js";
+import {Task} from "../db/models/index.js";
 import {RANDOM} from "./commandNames.js";
 import {getAgeWithColor, capitalizeFirstLetter} from "../utils.js";
 
@@ -11,7 +11,7 @@ const randomTaskCommand = new SlashCommandBuilder()
 const randomTask = async (interaction) => {
 	try {
 		// Retrieve all non-completed tasks
-		const tasks = await Improvement.findAll({
+		const tasks = await Task.findAll({
 			where: {
 				completed: false
 			}
@@ -30,7 +30,7 @@ const randomTask = async (interaction) => {
 		const randomTaskData = tasks[randomIndex];
 
 		// Build the three columns for the embed (single row)
-		const age = getAgeWithColor(randomTaskData.createdAt);
+		const age = getAgeWithColor(randomTaskData.createdAt, randomTaskData.lastCompletedAt);
 		const id = randomTaskData.id.toString();
 		const taskDescription = capitalizeFirstLetter(randomTaskData.value);
 
