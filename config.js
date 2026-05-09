@@ -10,4 +10,5 @@ export const CONFIG = {
 	DB_USER: process.env.DB_USER || 'postgres',
 	DB_PASSWORD: process.env.DB_PASSWORD,
 	DB_NAME: process.env.DB_NAME || 'improvement_bot',
+	NODE_ENV: process.env.NODE_ENV || 'production',
 }

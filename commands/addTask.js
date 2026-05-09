@@ -1,5 +1,5 @@
 import {SlashCommandBuilder} from "discord.js";
-import {Task} from "../db/models/index.js";
+import {Tag, Task, TaskTag} from "../db/models/index.js";
 import {ADD_TASK} from "./commandNames.js";
 import {sendRemainingTasksEmbed} from "../utils.js";
 
@@ -13,11 +13,19 @@ const addTaskCommand = new SlashCommandBuilder()
 			.setRequired(true)
 			.setMaxLength(100)
 	)
+	.addStringOption(option =>
+		option
+			.setName('tag')
+			.setDescription('Optional tag for this task')
+			.setRequired(false)
+			.setAutocomplete(true)
+	)
 
 
 const addTask =  async (interaction) => {
 	try {
 		const taskDescription = interaction.options.getString('task').trim();
+		const tagValue = interaction.options.getString('tag');
 		
 		// Validate task is not empty after trimming
 		if (!taskDescription) {
@@ -25,6 +33,18 @@ const addTask =  async (interaction) => {
 				content: '❌ Task description cannot be empty.',
 				ephemeral: true,
 			});
+		}
+		
+		// Validate tag if provided
+		let tag = null;
+		if (tagValue) {
+			tag = await Tag.findOne({ where: { value: tagValue } });
+			if (!tag) {
+				return await interaction.reply({
+					content: '❌ The selected tag does not exist.',
+					ephemeral: true,
+				});
+			}
 		}
 		
 		// Check if a task with the same description already exists (non-completed)
@@ -36,8 +56,9 @@ const addTask =  async (interaction) => {
 		});
 		
 		if (existingTask) {
-			return await interaction.editReply({
+			return await interaction.reply({
 				content: '❌ A task with this description already exists.',
+				ephemeral: true,
 			});
 		}
 		
@@ -46,6 +67,11 @@ const addTask =  async (interaction) => {
 			value: taskDescription,
 			completed: false,
 		});
+		
+		// Link tag if provided
+		if (tag) {
+			await TaskTag.create({ task_id: improvement.id, tag_id: tag.id });
+		}
 		
 		// Retrieve all non-completed tasks
 		const allTasks = await Task.findAll({
