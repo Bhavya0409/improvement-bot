@@ -73,32 +73,44 @@ export const isPlanTask = (task) => {
 	return task.tags?.some(tag => tag.value === 'plan') ?? false;
 };
 export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationContent) => {
-	// planTasks first, then regular (getTasks already orders this, but filter here for clarity)
 	const planTasks = tasks.filter(t => isPlanTask(t));
 	const regularTasks = tasks.filter(t => !isPlanTask(t));
-	const separator = planTasks.length > 0 && regularTasks.length > 0 ? [{ isSeparator: true }] : [];
-	const sorted = [...planTasks, ...separator, ...regularTasks];
 
-	const ages = sorted.map(task => task.isSeparator
-		? '--------'
-		: isPlanTask(task)
-			? '🤔'
-			: getAgeWithColor(task.createdAt, task.lastCompletedAt)).join('\n');
-	const spacer = sorted.map(task => task.isSeparator
-		? '-----'
-		: '\u200B').join('\n');
-	const descriptions = sorted.map(task => task.isSeparator
-		? '---------------------------------------------------------------------'
-		: capitalizeFirstLetter(task.value)).join('\n');
+	const fields = [];
+	
+	if (planTasks.length > 0) {
+		const planAges = planTasks.map(() => '🤔');
+		const planSpacer = planTasks.map(() => '\u200B');
+		const planDescriptions = planTasks.map(t => capitalizeFirstLetter(t.value));
+		
+		planAges.push('--------');
+		planSpacer.push('-----');
+		planDescriptions.push('---------------------------------------------------------------------');
+		
+		fields.push(
+			{ name: '\u200B', value: planAges.join('\n'), inline: true },
+			{ name: '\u200B', value: planSpacer.join('\n'), inline: true },
+			{ name: 'Plan Tasks', value: planDescriptions.join('\n'), inline: true }
+		);
+	}
+	
+	// Add regular tasks fields (if any)
+	if (regularTasks.length > 0) {
+		const regAges = regularTasks.map(t => getAgeWithColor(t.createdAt, t.lastCompletedAt)).join('\n');
+		const regSpacer = regularTasks.map(() => '\u200B').join('\n');
+		const regDescriptions = regularTasks.map(t => capitalizeFirstLetter(t.value)).join('\n');
+
+		fields.push(
+			{ name: 'Age', value: regAges, inline: true },
+			{ name: '\u200B', value: regSpacer, inline: true },
+			{ name: 'Tasks', value: regDescriptions, inline: true }
+		);
+	}
 
 	const embed = new EmbedBuilder()
 		.setColor('#FFA500')
 		.setTitle(`TASK LIST (${tasks.length})`)
-		.addFields(
-			{ name: 'Age', value: ages, inline: true },
-			{ name: '\u200B', value: spacer, inline: true },
-			{ name: 'Task', value: descriptions, inline: true },
-		)
+		.addFields(...fields)
 		.setFooter({ text: `Total active tasks: ${tasks.length}` });
 	
 	if (confirmationContent) {
