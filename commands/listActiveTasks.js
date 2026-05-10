@@ -1,7 +1,6 @@
 import {SlashCommandBuilder} from "discord.js";
-import {Task} from "../db/models/index.js";
 import {LIST_ACTIVE_TASKS} from "./commandNames.js";
-import {sendRemainingTasksEmbed} from "../utils.js";
+import {getTasks, sendRemainingTasksEmbed} from "../utils.js";
 
 const listActiveTasksCommand = new SlashCommandBuilder()
 	.setName(LIST_ACTIVE_TASKS)
@@ -11,18 +10,12 @@ const listActiveTasksCommand = new SlashCommandBuilder()
 const listActiveTasks = async (interaction) => {
 	try {
 		// Retrieve all non-completed tasks ordered from oldest to newest
-		const tasks = await Task.findAll({
-			where: {
-				completed: false
-			},
-			order: [['createdAt', 'ASC']]
-		});
+		const tasks = await getTasks();
 
 		// If no tasks, reply with a simple message
 		if (tasks.length === 0) {
 			return await interaction.reply({
 				content: '✅ No pending tasks!',
-				ephemeral: false,
 			});
 		}
 		
@@ -32,7 +25,6 @@ const listActiveTasks = async (interaction) => {
 		console.error('Error in list active tasks command:', error);
 		await interaction.reply({
 			content: '❌ Failed to retrieve tasks. Please try again.',
-			ephemeral: true,
 		});
 	}
 }
@@ -41,4 +33,3 @@ export {
 	listActiveTasksCommand,
 	listActiveTasks
 }
-

@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 import { Task, Instance } from "../db/models/index.js";
 import { REFRESH } from "./commandNames.js";
-import { sendRemainingTasksEmbed } from "../utils.js";
+import { getTasks, sendRemainingTasksEmbed } from "../utils.js";
 
 const refreshTaskCommand = new SlashCommandBuilder()
 	.setName(REFRESH)
@@ -73,12 +73,7 @@ const refreshTask = async (interaction) => {
 		const confirmationContent = `✅ Task '#${task.id} - ${task.value}' has been refreshed!`;
 		
 		// Retrieve remaining active tasks
-		const remainingTasks = await Task.findAll({
-			where: {
-				completed: false
-			},
-			order: [['createdAt', 'ASC']]
-		});
+		const remainingTasks = await getTasks();
 		
 		// If no remaining tasks
 		if (remainingTasks.length === 0) {
@@ -102,4 +97,6 @@ export {
 	refreshTaskCommand,
 	refreshTask
 }
+
+
 

@@ -1,7 +1,7 @@
 import {SlashCommandBuilder} from "discord.js";
 import {Tag, Task, TaskTag} from "../db/models/index.js";
 import {ADD_TASK} from "./commandNames.js";
-import {sendRemainingTasksEmbed} from "../utils.js";
+import {getTasks, sendRemainingTasksEmbed} from "../utils.js";
 
 const addTaskCommand = new SlashCommandBuilder()
 	.setName(ADD_TASK)
@@ -74,12 +74,7 @@ const addTask =  async (interaction) => {
 		}
 		
 		// Retrieve all non-completed tasks
-		const allTasks = await Task.findAll({
-			where: {
-				completed: false
-			},
-			order: [['createdAt', 'ASC']]
-		});
+		const allTasks = await getTasks();
 		
 		// Send success reply with confirmation
 		const confirmationContent = `✅ Task '${improvement.value}' added to your improvements list!`;
@@ -106,3 +101,4 @@ export {
 	addTaskCommand,
 	addTask
 }
+

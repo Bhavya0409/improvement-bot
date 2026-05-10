@@ -1,4 +1,5 @@
 import {EmbedBuilder} from "discord.js";
+import {Tag, Task} from "./db/models/index.js";
 
 export const calculateAge = (createdAt, lastCompletedAt) => {
 	// Prioritize lastCompletedAt if it exists
@@ -68,18 +69,27 @@ export const getAgeWithColor = (createdAt, lastCompletedAt) => {
 export const capitalizeFirstLetter = (str) => {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 };
+export const isPlanTask = (task) => {
+	return task.tags?.some(tag => tag.value === 'plan') ?? false;
+};
 export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationContent) => {
-	const ids = tasks.map(task => task.id.toString()).join('\n');
-	const taskDescriptions = tasks.map(task => capitalizeFirstLetter(task.value)).join('\n');
-	const ages = tasks.map(task => getAgeWithColor(task.createdAt, task.lastCompletedAt)).join('\n');
-	
+	// planTasks first, then regular (getTasks already orders this, but filter here for clarity)
+	const sorted = [
+		...tasks.filter(t => isPlanTask(t)),
+		...tasks.filter(t => !isPlanTask(t)),
+	];
+
+	const ages = sorted.map(task => isPlanTask(task) ? '🤔' : getAgeWithColor(task.createdAt, task.lastCompletedAt)).join('\n') || '\u200B';
+	const spacer = sorted.map(() => '\u200B').join('\n') || '\u200B';
+	const descriptions = sorted.map(task => capitalizeFirstLetter(task.value)).join('\n') || '\u200B';
+
 	const embed = new EmbedBuilder()
 		.setColor('#FFA500')
-		.setTitle(`⏳ REMAINING ACTIVE TASKS (${tasks.length})`)
+		.setTitle(`TASK LIST (${tasks.length})`)
 		.addFields(
 			{ name: 'Age', value: ages, inline: true },
-			{ name: 'ID', value: ids, inline: true },
-			{ name: 'Task', value: taskDescriptions, inline: true }
+			{ name: '\u200B', value: spacer, inline: true },
+			{ name: 'Task', value: descriptions, inline: true },
 		)
 		.setFooter({ text: `Total active tasks: ${tasks.length}` });
 	
@@ -95,4 +105,18 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 			ephemeral: false,
 		});
 	}
+}
+export const getTasks = async () => {
+	const allTasks = await Task.findAll({
+		where: { completed: false },
+		order: [['createdAt', 'ASC']],
+		include: [{ model: Tag, as: 'tags' }],
+	});
+
+	const [planTasks, nonPlanTasks] = allTasks.reduce((acc, task) => {
+		acc[isPlanTask(task) ? 0 : 1].push(task);
+		return acc;
+	}, [[], []]);
+
+	return [...planTasks, ...nonPlanTasks];
 }

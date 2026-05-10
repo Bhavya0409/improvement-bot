@@ -1,7 +1,7 @@
-import {SlashCommandBuilder, EmbedBuilder} from "discord.js";
+import {SlashCommandBuilder} from "discord.js";
 import {Task} from "../db/models/index.js";
 import {EDIT_TASK} from "./commandNames.js";
-import {getAgeWithColor, capitalizeFirstLetter} from "../utils.js";
+import {getTasks, sendRemainingTasksEmbed} from "../utils.js";
 
 const editTaskCommand = new SlashCommandBuilder()
 	.setName(EDIT_TASK)
@@ -68,12 +68,7 @@ const editTask = async (interaction) => {
 		const confirmationContent = `✅ Task '#${improvement.id} - ${oldDescription}' has been updated to '${newDescription}'!`;
 		
 		// Retrieve remaining active tasks
-		const remainingTasks = await Task.findAll({
-			where: {
-				completed: false
-			},
-			order: [['createdAt', 'ASC']]
-		});
+		const remainingTasks = await getTasks();
 		
 		// If no remaining tasks
 		if (remainingTasks.length === 0) {
@@ -82,26 +77,7 @@ const editTask = async (interaction) => {
 			});
 		}
 		
-		// Build embed with remaining tasks
-		const ids = remainingTasks.map(task => task.id.toString()).join('\n');
-		const taskDescriptions = remainingTasks.map(task => capitalizeFirstLetter(task.value)).join('\n');
-		const ages = remainingTasks.map(task => getAgeWithColor(task.createdAt, task.lastCompletedAt)).join('\n');
-		
-		const embed = new EmbedBuilder()
-			.setColor('#FFA500')
-			.setTitle(`⏳ ACTIVE TASKS (${remainingTasks.length})`)
-			.addFields(
-				{ name: 'Age', value: ages, inline: true },
-				{ name: 'ID', value: ids, inline: true },
-				{ name: 'Task', value: taskDescriptions, inline: true }
-			)
-			.setFooter({ text: `Total active tasks: ${remainingTasks.length}` });
-		
-		// Send success reply with confirmation and active tasks embed
-		await interaction.reply({
-			content: confirmationContent,
-			embeds: [embed],
-		});
+		await sendRemainingTasksEmbed(interaction, remainingTasks, confirmationContent);
 	} catch (error) {
 		console.error('Error in edit command:', error);
 		try {
@@ -118,3 +94,5 @@ export {
 	editTaskCommand,
 	editTask
 }
+
+

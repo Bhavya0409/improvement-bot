@@ -13,8 +13,8 @@ export const TaskTag = defineTaskTag(sequelize);
 Task.hasMany(Instance, { foreignKey: 'task_id', onDelete: 'CASCADE' });
 Instance.belongsTo(Task, { foreignKey: 'task_id' });
 
-Task.belongsToMany(Tag, { through: TaskTag, foreignKey: 'task_id' });
-Tag.belongsToMany(Task, { through: TaskTag, foreignKey: 'tag_id' });
+Task.belongsToMany(Tag, { through: TaskTag, foreignKey: 'task_id', as: 'tags' });
+Tag.belongsToMany(Task, { through: TaskTag, foreignKey: 'tag_id', as: 'tasks' });
 
-TaskTag.belongsTo(Task, { foreignKey: 'task_id' });
-TaskTag.belongsTo(Tag, { foreignKey: 'tag_id' });
+TaskTag.belongsTo(Task, { foreignKey: 'task_id', as: 'task' });
+TaskTag.belongsTo(Tag, { foreignKey: 'tag_id', as: 'tag' });

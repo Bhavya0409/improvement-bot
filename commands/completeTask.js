@@ -1,7 +1,7 @@
 import {SlashCommandBuilder} from "discord.js";
 import {Task} from "../db/models/index.js";
 import {COMPLETE_TASK} from "./commandNames.js";
-import {sendRemainingTasksEmbed} from "../utils.js";
+import {getTasks, sendRemainingTasksEmbed} from "../utils.js";
 
 const completeTaskCommand = new SlashCommandBuilder()
 	.setName(COMPLETE_TASK)
@@ -69,12 +69,7 @@ const completeTask = async (interaction) => {
 		const confirmationContent = `✅ Task '#${improvement.id} - ${improvement.value}' has been marked as completed!`;
 		
 		// Retrieve remaining active tasks
-		const remainingTasks = await Task.findAll({
-			where: {
-				completed: false
-			},
-			order: [['createdAt', 'ASC']]
-		});
+		const remainingTasks = await getTasks();
 		
 		// If no remaining tasks
 		if (remainingTasks.length === 0) {
@@ -98,3 +93,5 @@ export {
 	completeTaskCommand,
 	completeTask
 }
+
+

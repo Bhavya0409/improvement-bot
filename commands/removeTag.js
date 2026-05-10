@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { Tag, Task, TaskTag } from '../db/models/index.js';
 import { REMOVE_TAG } from './commandNames.js';
-import { sendRemainingTasksEmbed } from '../utils.js';
+import { getTasks, sendRemainingTasksEmbed } from '../utils.js';
 
 const removeTagCommand = new SlashCommandBuilder()
 	.setName(REMOVE_TAG)
@@ -61,10 +61,7 @@ const removeTag = async (interaction) => {
 
 		await taskTag.destroy();
 
-		const allTasks = await Task.findAll({
-			where: { completed: false },
-			order: [['createdAt', 'ASC']],
-		});
+		const allTasks = await getTasks();
 
 		const confirmationContent = `✅ Tag '${tag.displayValue}' removed from task '${task.value}'!`;
 		await sendRemainingTasksEmbed(interaction, allTasks, confirmationContent);
@@ -78,4 +75,6 @@ const removeTag = async (interaction) => {
 };
 
 export { removeTagCommand, removeTag };
+
+
 

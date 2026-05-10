@@ -1,7 +1,6 @@
-import {SlashCommandBuilder, EmbedBuilder} from "discord.js";
-import {Task} from "../db/models/index.js";
+import {SlashCommandBuilder} from "discord.js";
 import {RANDOM} from "./commandNames.js";
-import {getAgeWithColor, capitalizeFirstLetter} from "../utils.js";
+import {getTasks, getAgeWithColor, capitalizeFirstLetter} from "../utils.js";
 
 const randomTaskCommand = new SlashCommandBuilder()
 	.setName(RANDOM)
@@ -11,11 +10,7 @@ const randomTaskCommand = new SlashCommandBuilder()
 const randomTask = async (interaction) => {
 	try {
 		// Retrieve all non-completed tasks
-		const tasks = await Task.findAll({
-			where: {
-				completed: false
-			}
-		});
+		const tasks = await getTasks();
 
 		// If no tasks, reply with a simple message
 		if (tasks.length === 0) {
@@ -64,4 +59,6 @@ export {
 	randomTaskCommand,
 	randomTask
 }
+
+
 

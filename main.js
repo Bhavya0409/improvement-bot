@@ -3,8 +3,8 @@ import {CONFIG} from "./config.js";
 import sequelize from "./db/index.js";
 import {COMMAND_EXECUTIONS, registerCommands} from "./commands/index.js";
 import {Task, Tag, TaskTag} from "./db/models/index.js";
-import {Op} from "sequelize";
 import {ADD_TAG, ADD_TASK, EDIT_TASK, REMOVE_TAG} from "./commands/commandNames.js";
+import {Op} from "sequelize";
 
 const CLIENT = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages],
@@ -29,7 +29,7 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 			const findOptions = { where: { completed: false } };
 			if (commandName === REMOVE_TAG) {
 				// Only show tasks that have at least one tag
-				findOptions.include = [{ model: Tag, required: true }];
+				findOptions.include = [{ model: Tag, as: 'tags', required: true }];
 			}
 			const tasks = await Task.findAll(findOptions);
 			const choices = tasks.map(task => {
@@ -75,9 +75,9 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 			const taskValue = interaction.options.getString('task') || '';
 			const taskId = parseInt(taskValue.split(' - ')[0]);
 			if (isNaN(taskId)) return await interaction.respond([]);
-			const taskTags = await TaskTag.findAll({ where: { task_id: taskId }, include: [Tag] });
+			const taskTags = await TaskTag.findAll({ where: { task_id: taskId }, include: [{ model: Tag, as: 'tag' }] });
 			const choices = taskTags
-				.map(tt => ({ name: tt.Tag.displayValue, value: tt.Tag.value }))
+				.map(tt => ({ name: tt.tag.displayValue, value: tt.tag.value }))
 				.filter(c => c.name.toLowerCase().includes(focusedValue.toLowerCase()));
 			return await interaction.respond(choices.slice(0, 25));
 		}
@@ -92,16 +92,19 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 // Handle slash command interactions
 CLIENT.on(Events.InteractionCreate, async (interaction) => {
 	if (!interaction.isChatInputCommand()) return;
-	
+
+
 	try {
 		const commandToExecute = COMMAND_EXECUTIONS[interaction.commandName]
 		await commandToExecute(interaction)
 	} catch (error) {
 		console.error('Error executing command:', error);
-		await interaction.reply({
-			content: '❌ An error occurred while executing this command.',
-			ephemeral: true,
-		});
+		try {
+			await interaction.reply({
+				content: '❌ An error occurred while executing this command.',
+				ephemeral: true,
+			});
+		} catch (_) {}
 	}
 });
 

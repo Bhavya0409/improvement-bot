@@ -1,12 +1,9 @@
-import {CONFIG} from "../config.js";
+export const ADD_TASK = 'add'
+export const COMPLETE_TASK = 'complete'
+export const LIST_ACTIVE_TASKS = 'list'
+export const RANDOM = 'random'
+export const EDIT_TASK = 'edit'
+export const REFRESH = 'refresh'
+export const ADD_TAG = 'addtag'
+export const REMOVE_TAG = 'removetag'
 
-const suffix = CONFIG.NODE_ENV === 'development' ? '-dev' : '';
-
-export const ADD_TASK = `add${suffix}`
-export const COMPLETE_TASK = `complete${suffix}`
-export const LIST_ACTIVE_TASKS = `list${suffix}`
-export const RANDOM = `random${suffix}`
-export const EDIT_TASK = `edit${suffix}`
-export const REFRESH = `refresh${suffix}`
-export const ADD_TAG = `addtag${suffix}`
-export const REMOVE_TAG = `removetag${suffix}`

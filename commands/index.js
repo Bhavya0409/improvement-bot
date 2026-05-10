@@ -55,3 +55,4 @@ export const registerCommands = async () => {
 		{ body: COMMANDS.map(command => command.toJSON()) }
 	);
 }
+

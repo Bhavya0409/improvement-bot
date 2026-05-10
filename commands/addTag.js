@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { Tag, Task, TaskTag } from '../db/models/index.js';
 import { ADD_TAG } from './commandNames.js';
-import { sendRemainingTasksEmbed } from '../utils.js';
+import { getTasks, sendRemainingTasksEmbed } from '../utils.js';
 
 const addTagCommand = new SlashCommandBuilder()
 	.setName(ADD_TAG)
@@ -62,10 +62,7 @@ const addTag = async (interaction) => {
 
 		await TaskTag.create({ task_id: task.id, tag_id: tag.id });
 
-		const allTasks = await Task.findAll({
-			where: { completed: false },
-			order: [['createdAt', 'ASC']],
-		});
+		const allTasks = await getTasks();
 
 		const confirmationContent = `✅ Tag '${tag.displayValue}' added to task '${task.value}'!`;
 		await sendRemainingTasksEmbed(interaction, allTasks, confirmationContent);
@@ -79,4 +76,6 @@ const addTag = async (interaction) => {
 };
 
 export { addTagCommand, addTag };
+
+
 
