@@ -74,14 +74,22 @@ export const isPlanTask = (task) => {
 };
 export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationContent) => {
 	// planTasks first, then regular (getTasks already orders this, but filter here for clarity)
-	const sorted = [
-		...tasks.filter(t => isPlanTask(t)),
-		...tasks.filter(t => !isPlanTask(t)),
-	];
+	const planTasks = tasks.filter(t => isPlanTask(t));
+	const regularTasks = tasks.filter(t => !isPlanTask(t));
+	const separator = planTasks.length > 0 && regularTasks.length > 0 ? [{ isSeparator: true }] : [];
+	const sorted = [...planTasks, ...separator, ...regularTasks];
 
-	const ages = sorted.map(task => isPlanTask(task) ? '🤔' : getAgeWithColor(task.createdAt, task.lastCompletedAt)).join('\n') || '\u200B';
-	const spacer = sorted.map(() => '\u200B').join('\n') || '\u200B';
-	const descriptions = sorted.map(task => capitalizeFirstLetter(task.value)).join('\n') || '\u200B';
+	const ages = sorted.map(task => task.isSeparator
+		? '--------'
+		: isPlanTask(task)
+			? '🤔'
+			: getAgeWithColor(task.createdAt, task.lastCompletedAt)).join('\n');
+	const spacer = sorted.map(task => task.isSeparator
+		? '-----'
+		: '\u200B').join('\n');
+	const descriptions = sorted.map(task => task.isSeparator
+		? '----------------------------------------------------'
+		: capitalizeFirstLetter(task.value)).join('\n');
 
 	const embed = new EmbedBuilder()
 		.setColor('#FFA500')
