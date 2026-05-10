@@ -88,7 +88,7 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 		? '-----'
 		: '\u200B').join('\n');
 	const descriptions = sorted.map(task => task.isSeparator
-		? '----------------------------------------------------'
+		? '---------------------------------------------------------------------'
 		: capitalizeFirstLetter(task.value)).join('\n');
 
 	const embed = new EmbedBuilder()

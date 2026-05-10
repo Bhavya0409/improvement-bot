@@ -3,7 +3,7 @@ import {CONFIG} from "./config.js";
 import sequelize from "./db/index.js";
 import {COMMAND_EXECUTIONS, registerCommands} from "./commands/index.js";
 import {Task, Tag, TaskTag} from "./db/models/index.js";
-import {ADD_TAG, ADD_TASK, EDIT_TASK, REMOVE_TAG} from "./commands/commandNames.js";
+import {ADD_TAG, ADD_TASK, EDIT_TASK, REMOVE_TAG, PLAN, UNPLAN} from "./commands/commandNames.js";
 import {Op} from "sequelize";
 
 const CLIENT = new Client({
@@ -24,12 +24,38 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 	const focusedValue = focusedOption.value;
 
 	try {
-		// Task autocomplete: used by complete, edit, refresh, addtag, removetag
+		// Task autocomplete: used by complete, edit, refresh, addtag, removetag, plan, unplan
 		if (focusedOption.name === 'task') {
 			const findOptions = { where: { completed: false } };
 			if (commandName === REMOVE_TAG) {
 				// Only show tasks that have at least one tag
 				findOptions.include = [{ model: Tag, as: 'tags', required: true }];
+			}
+			if (commandName === PLAN) {
+				// Only show tasks that do NOT already have the "plan" tag
+				const planTag = await Tag.findOne({ where: { value: 'plan' } });
+				if (planTag) {
+					const plannedTaskTags = await TaskTag.findAll({ where: { tag_id: planTag.id } });
+					const plannedTaskIds = plannedTaskTags.map(tt => tt.task_id);
+					findOptions.where = {
+						completed: false,
+						...(plannedTaskIds.length > 0 ? { id: { [Op.notIn]: plannedTaskIds } } : {}),
+					};
+				}
+			}
+			if (commandName === UNPLAN) {
+				// Only show tasks that already have the "plan" tag
+				const planTag = await Tag.findOne({ where: { value: 'plan' } });
+				if (planTag) {
+					const plannedTaskTags = await TaskTag.findAll({ where: { tag_id: planTag.id } });
+					const plannedTaskIds = plannedTaskTags.map(tt => tt.task_id);
+					findOptions.where = {
+						completed: false,
+						...(plannedTaskIds.length > 0 ? { id: { [Op.in]: plannedTaskIds } } : { id: -1 }),
+					};
+				} else {
+					findOptions.where = { id: -1 }; // no plan tag exists, show nothing
+				}
 			}
 			const tasks = await Task.findAll(findOptions);
 			const choices = tasks.map(task => {

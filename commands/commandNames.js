@@ -6,4 +6,6 @@ export const EDIT_TASK = 'edit'
 export const REFRESH = 'refresh'
 export const ADD_TAG = 'addtag'
 export const REMOVE_TAG = 'removetag'
+export const PLAN = 'plan'
+export const UNPLAN = 'unplan'
 
