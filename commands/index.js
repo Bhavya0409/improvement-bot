@@ -1,6 +1,6 @@
 import {REST, Routes} from "discord.js";
 import {CONFIG} from "../config.js";
-import {ADD_TASK, COMPLETE_TASK, LIST_ACTIVE_TASKS, RANDOM, EDIT_TASK, REFRESH, ADD_TAG, REMOVE_TAG, PLAN, UNPLAN} from "./commandNames.js";
+import {ADD_TASK, COMPLETE_TASK, LIST_ACTIVE_TASKS, RANDOM, EDIT_TASK, REFRESH, ADD_TAG, REMOVE_TAG, PLAN, UNPLAN, ADD_PLAN} from "./commandNames.js";
 
 // Add Command
 import {addTask, addTaskCommand} from './addTask.js'
@@ -32,6 +32,9 @@ import {planTask, planTaskCommand} from './planTask.js'
 // Unplan Task Command
 import {unplanTask, unplanTaskCommand} from './unplanTask.js'
 
+// Add Plan Task Command
+import {addPlanTask, addPlanTaskCommand} from './addPlanTask.js'
+
 const COMMANDS = [
 	addTaskCommand,
 	completeTaskCommand,
@@ -43,6 +46,7 @@ const COMMANDS = [
 	removeTagCommand,
 	planTaskCommand,
 	unplanTaskCommand,
+	addPlanTaskCommand,
 ]
 
 export const COMMAND_EXECUTIONS = {
@@ -56,6 +60,7 @@ export const COMMAND_EXECUTIONS = {
 	[REMOVE_TAG]: removeTag,
 	[PLAN]: planTask,
 	[UNPLAN]: unplanTask,
+	[ADD_PLAN]: addPlanTask,
 }
 
 export const registerCommands = async () => {
