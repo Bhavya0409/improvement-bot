@@ -16,7 +16,7 @@ export const calculateAge = (createdAt, lastCompletedAt) => {
 	
 	// Less than 1 minute
 	if (diffInMinutes < 1) {
-		return 'Just now';
+		return 'Now';
 	}
 	
 	// Less than 1 hour
