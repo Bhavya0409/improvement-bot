@@ -119,7 +119,6 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 CLIENT.on(Events.InteractionCreate, async (interaction) => {
 	if (!interaction.isChatInputCommand()) return;
 
-
 	try {
 		const commandToExecute = COMMAND_EXECUTIONS[interaction.commandName]
 		await commandToExecute(interaction)

@@ -129,9 +129,16 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 export const getTasks = async () => {
 	const allTasks = await Task.findAll({
 		where: { completed: false },
-		order: [['createdAt', 'ASC']],
 		include: [{ model: Tag, as: 'tags' }],
 	});
+
+	const getSortDate = (task) => new Date(
+		task.lastCompletedAt && new Date(task.lastCompletedAt) > new Date(task.createdAt)
+			? task.lastCompletedAt
+			: task.createdAt
+	);
+
+	allTasks.sort((a, b) => getSortDate(a) - getSortDate(b));
 
 	const [planTasks, nonPlanTasks] = allTasks.reduce((acc, task) => {
 		acc[isPlanTask(task) ? 0 : 1].push(task);
