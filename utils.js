@@ -77,6 +77,7 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 	const regularTasks = tasks.filter(t => !isPlanTask(t));
 
 	const fields = [];
+	let descriptionFieldLength = 0
 	
 	if (planTasks.length > 0) {
 		const planAges = planTasks.map(() => '🤔');
@@ -99,6 +100,7 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 		const regAges = regularTasks.map(t => getAgeWithColor(t.createdAt, t.lastCompletedAt)).join('\n');
 		const regSpacer = regularTasks.map(() => '\u200B').join('\n');
 		const regDescriptions = regularTasks.map(t => capitalizeFirstLetter(t.value)).join('\n');
+		descriptionFieldLength = regDescriptions.length
 
 		fields.push(
 			{ name: 'Age', value: regAges, inline: true },
@@ -107,11 +109,14 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 		);
 	}
 
+	const charsLeft = 1024 - descriptionFieldLength;
+	const embedColor = charsLeft < 100 ? '#C0392B' : charsLeft < 300 ? '#D4AC0D' : '#1E8449';
+
 	const embed = new EmbedBuilder()
-		.setColor('#FFA500')
+		.setColor(embedColor)
 		.setTitle(`TASK LIST (${tasks.length})`)
 		.addFields(...fields)
-		.setFooter({ text: `Total active tasks: ${tasks.length}` });
+		.setFooter({ text: `Total active tasks: ${tasks.length} | Characters left in task field: ${charsLeft}/1024` });
 	
 	if (confirmationContent) {
 		await interaction.reply({
