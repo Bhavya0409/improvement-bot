@@ -1,10 +1,10 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { Tag, Task, TaskTag } from '../db/models/index.js';
-import { ADD_TAG } from './commandNames.js';
+import { TAG } from './commandNames.js';
 import { getTasks, sendRemainingTasksEmbed } from '../utils.js';
 
 const addTagCommand = new SlashCommandBuilder()
-	.setName(ADD_TAG)
+	.setName(TAG)
 	.setDescription('Add a tag to an existing task')
 	.addStringOption(option =>
 		option
