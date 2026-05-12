@@ -116,7 +116,7 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 		.setColor(embedColor)
 		.setTitle(`TASK LIST (${tasks.length})`)
 		.addFields(...fields)
-		.setFooter({ text: `Total active tasks: ${tasks.length} | Characters left in task field: ${charsLeft}/1024` });
+		.setFooter({ text: `${charsLeft}/1024 - Characters left | ${tasks.length} - Total active tasks` });
 	
 	if (confirmationContent) {
 		await interaction.reply({
