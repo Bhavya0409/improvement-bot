@@ -1,13 +1,12 @@
 export const ADD_TASK = 'add'
+export const ADD_PLAN = 'addplan' // TODO rename to make more intuitive
 export const COMPLETE_TASK = 'complete'
-export const LIST_ACTIVE_TASKS = 'list'
-export const RANDOM = 'random'
 export const EDIT_TASK = 'edit'
+export const LIST_ACTIVE_TASKS = 'list'
+export const PLAN = 'plan' // TODO rename to make more intuitive
+export const RANDOM = 'random'
 export const REFRESH = 'refresh'
 export const TAG = 'tag'
-export const UNTAG = 'untag'
 export const TAG_ADD = 'tagadd'
-export const PLAN = 'plan'
-export const UNPLAN = 'unplan'
-export const ADD_PLAN = 'addplan'
-
+export const UNPLAN = 'unplan' // TODO rename to make more intuitive
+export const UNTAG = 'untag'

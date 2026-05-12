@@ -1,7 +1,7 @@
 import {Client, Events, GatewayIntentBits} from "discord.js";
 import {CONFIG} from "./config.js";
 import sequelize from "./db/index.js";
-import {COMMAND_EXECUTIONS, registerCommands} from "./commands/index.js";
+import {COMMAND_CONFIG, registerCommands} from "./commands/index.js";
 import {Task, Tag, TaskTag} from "./db/models/index.js";
 import {TAG, ADD_TASK, EDIT_TASK, UNTAG, PLAN, UNPLAN} from "./commands/commandNames.js";
 import {Op} from "sequelize";
@@ -15,23 +15,33 @@ CLIENT.once(Events.ClientReady, async (client) => {
 	console.log(`Bot logged in as ${client.user.tag}`);
 })
 
+// Build alias -> canonical command name lookup
+const ALIAS_TO_COMMAND = Object.entries(COMMAND_CONFIG).reduce((acc, [cmdName, config]) => {
+	for (const alias of config.aliases) {
+		acc[alias] = cmdName;
+	}
+	return acc;
+}, {});
+
+const resolveCommandName = (name) => ALIAS_TO_COMMAND[name] ?? name;
+
 // Handle autocomplete interactions
 CLIENT.on(Events.InteractionCreate, async (interaction) => {
 	if (!interaction.isAutocomplete()) return;
 
-	const { commandName } = interaction;
+	const resolvedCommandName = resolveCommandName(interaction.commandName);
 	const focusedOption = interaction.options.getFocused(true);
 	const focusedValue = focusedOption.value;
 
 	try {
-		// Task autocomplete: used by complete, edit, refresh, addtag, removetag, plan, unplan
+		// Task autocomplete: used by complete, edit, refresh, tag, untag, plan, unplan
 		if (focusedOption.name === 'task') {
 			const findOptions = { where: { completed: false } };
-			if (commandName === UNTAG) {
+			if (resolvedCommandName === UNTAG) {
 				// Only show tasks that have at least one tag
 				findOptions.include = [{ model: Tag, as: 'tags', required: true }];
 			}
-			if (commandName === PLAN) {
+			if (resolvedCommandName === PLAN) {
 				// Only show tasks that do NOT already have the "plan" tag
 				const planTag = await Tag.findOne({ where: { value: 'plan' } });
 				if (planTag) {
@@ -43,7 +53,7 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 					};
 				}
 			}
-			if (commandName === UNPLAN) {
+			if (resolvedCommandName === UNPLAN) {
 				// Only show tasks that already have the "plan" tag
 				const planTag = await Tag.findOne({ where: { value: 'plan' } });
 				if (planTag) {
@@ -59,7 +69,7 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 			}
 			const tasks = await Task.findAll(findOptions);
 			const choices = tasks.map(task => {
-				if (commandName === EDIT_TASK) {
+				if (resolvedCommandName === EDIT_TASK) {
 					return { name: task.value, value: task.value };
 				}
 				return {
@@ -71,7 +81,7 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 		}
 
 		// Tag autocomplete for /add: all tags
-		if (focusedOption.name === 'tag' && commandName === ADD_TASK) {
+		if (focusedOption.name === 'tag' && resolvedCommandName === ADD_TASK) {
 			const tags = await Tag.findAll();
 			const choices = tags
 				.map(t => ({ name: t.displayValue, value: t.value }))
@@ -80,7 +90,7 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 		}
 
 		// Tag autocomplete for /tag: tags NOT yet on the selected task
-		if (focusedOption.name === 'tag' && commandName === TAG) {
+		if (focusedOption.name === 'tag' && resolvedCommandName === TAG) {
 			const taskValue = interaction.options.getString('task') || '';
 			const taskId = parseInt(taskValue.split(' - ')[0]);
 			let excludeTagIds = [];
@@ -97,7 +107,7 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 		}
 
 		// Tag autocomplete for /untag: only tags ON the selected task
-		if (focusedOption.name === 'tag' && commandName === UNTAG) {
+		if (focusedOption.name === 'tag' && resolvedCommandName === UNTAG) {
 			const taskValue = interaction.options.getString('task') || '';
 			const taskId = parseInt(taskValue.split(' - ')[0]);
 			if (isNaN(taskId)) return await interaction.respond([]);
@@ -120,7 +130,8 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 	if (!interaction.isChatInputCommand()) return;
 
 	try {
-		const commandToExecute = COMMAND_EXECUTIONS[interaction.commandName]
+		const resolvedCommandName = resolveCommandName(interaction.commandName);
+		const commandToExecute = COMMAND_CONFIG[resolvedCommandName]?.executionFn;
 		await commandToExecute(interaction)
 	} catch (error) {
 		console.error('Error executing command:', error);
