@@ -1,10 +1,10 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { Tag, Task, TaskTag } from '../db/models/index.js';
-import { REMOVE_TAG } from './commandNames.js';
+import { UNTAG } from './commandNames.js';
 import { getTasks, sendRemainingTasksEmbed } from '../utils.js';
 
 const removeTagCommand = new SlashCommandBuilder()
-	.setName(REMOVE_TAG)
+	.setName(UNTAG)
 	.setDescription('Remove a tag from an existing task')
 	.addStringOption(option =>
 		option

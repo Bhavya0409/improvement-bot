@@ -3,7 +3,7 @@ import {CONFIG} from "./config.js";
 import sequelize from "./db/index.js";
 import {COMMAND_EXECUTIONS, registerCommands} from "./commands/index.js";
 import {Task, Tag, TaskTag} from "./db/models/index.js";
-import {ADD_TAG, ADD_TASK, EDIT_TASK, REMOVE_TAG, PLAN, UNPLAN} from "./commands/commandNames.js";
+import {TAG, ADD_TASK, EDIT_TASK, UNTAG, PLAN, UNPLAN} from "./commands/commandNames.js";
 import {Op} from "sequelize";
 
 const CLIENT = new Client({
@@ -27,7 +27,7 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 		// Task autocomplete: used by complete, edit, refresh, addtag, removetag, plan, unplan
 		if (focusedOption.name === 'task') {
 			const findOptions = { where: { completed: false } };
-			if (commandName === REMOVE_TAG) {
+			if (commandName === UNTAG) {
 				// Only show tasks that have at least one tag
 				findOptions.include = [{ model: Tag, as: 'tags', required: true }];
 			}
@@ -79,8 +79,8 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 			return await interaction.respond(choices.slice(0, 25));
 		}
 
-		// Tag autocomplete for /addtag: tags NOT yet on the selected task
-		if (focusedOption.name === 'tag' && commandName === ADD_TAG) {
+		// Tag autocomplete for /tag: tags NOT yet on the selected task
+		if (focusedOption.name === 'tag' && commandName === TAG) {
 			const taskValue = interaction.options.getString('task') || '';
 			const taskId = parseInt(taskValue.split(' - ')[0]);
 			let excludeTagIds = [];
@@ -96,8 +96,8 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 			return await interaction.respond(choices.slice(0, 25));
 		}
 
-		// Tag autocomplete for /removetag: only tags ON the selected task
-		if (focusedOption.name === 'tag' && commandName === REMOVE_TAG) {
+		// Tag autocomplete for /untag: only tags ON the selected task
+		if (focusedOption.name === 'tag' && commandName === UNTAG) {
 			const taskValue = interaction.options.getString('task') || '';
 			const taskId = parseInt(taskValue.split(' - ')[0]);
 			if (isNaN(taskId)) return await interaction.respond([]);
