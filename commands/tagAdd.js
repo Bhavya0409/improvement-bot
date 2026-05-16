@@ -34,10 +34,11 @@ const tagAdd = async (interaction) => {
 		}
 
 		await Tag.create({ value, displayValue });
-
-		const allTasks = await getTasks();
-		const confirmationContent = `✅ Tag '${displayValue}' created successfully!`;
-		await sendRemainingTasksEmbed(interaction, allTasks, confirmationContent);
+		
+		return await interaction.reply({
+			content: `✅ Tag '${displayValue}' created successfully!`,
+			ephemeral: false,
+		});
 	} catch (error) {
 		console.error('Error in tagadd command:', error);
 		await interaction.reply({

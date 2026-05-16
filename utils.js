@@ -69,12 +69,15 @@ export const getAgeWithColor = (createdAt, lastCompletedAt) => {
 export const capitalizeFirstLetter = (str) => {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 };
-export const isPlanTask = (task) => {
-	return task.tags?.some(tag => tag.value === 'plan') ?? false;
-};
+const doesTaskHaveTag = (task, tag) => {
+	return task.tags?.some(t => t.value === tag) ?? false;
+}
+export const isPlanTask = (task) => doesTaskHaveTag(task, 'plan');
+export const isArchivedTask = (task) => doesTaskHaveTag(task, 'archive');
 export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationContent) => {
 	const planTasks = tasks.filter(t => isPlanTask(t));
 	const regularTasks = tasks.filter(t => !isPlanTask(t));
+	const archivedTasks = tasks.filter(t => isArchivedTask(t));
 
 	const fields = [];
 	let descriptionFieldLength = 0
@@ -92,6 +95,22 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 			{ name: '\u200B', value: planAges.join('\n'), inline: true },
 			{ name: '\u200B', value: planSpacer.join('\n'), inline: true },
 			{ name: 'Plan Tasks', value: planDescriptions.join('\n'), inline: true }
+		);
+	}
+	
+	if (archivedTasks.length > 0) {
+		const archivedAges = archivedTasks.map((t) => calculateAge(t.createdAt, t.lastCompletedAt));
+		const archivedSpacer = archivedTasks.map(() => '\u200B');
+		const archivedDescriptions = archivedTasks.map(t => capitalizeFirstLetter(t.value));
+		
+		archivedAges.push('--------');
+		archivedSpacer.push('-----');
+		archivedDescriptions.push('---------------------------------------------------------------------');
+		
+		fields.push(
+			{ name: '\u200B', value: archivedAges.join('\n'), inline: true },
+			{ name: '\u200B', value: archivedSpacer.join('\n'), inline: true },
+			{ name: 'Archived Tasks', value: archivedDescriptions.join('\n'), inline: true }
 		);
 	}
 	

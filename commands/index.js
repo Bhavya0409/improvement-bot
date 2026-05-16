@@ -1,6 +1,9 @@
 import {REST, Routes} from "discord.js";
 import {CONFIG} from "../config.js";
-import {ADD_TASK, COMPLETE_TASK, LIST_ACTIVE_TASKS, RANDOM, EDIT_TASK, REFRESH, TAG, UNTAG, TAG_ADD, PLAN, UNPLAN, ADD_PLAN} from "./commandNames.js";
+import {
+	ADD_TASK, COMPLETE_TASK, LIST_ACTIVE_TASKS, RANDOM, EDIT_TASK, REFRESH, TAG, UNTAG, TAG_ADD, PLAN, UNPLAN, ADD_PLAN,
+	ARCHIVE_TASK
+} from "./commandNames.js";
 
 // Add Command
 import {addTask, addTaskCommand} from './addTask.js'
@@ -38,7 +41,15 @@ import {unplanTask, unplanTaskCommand} from './unplanTask.js'
 // Untag Command
 import {removeTag, removeTagCommand} from './untag.js'
 
+// Archive Task Command
+import {archiveTask, archiveTaskCommand} from "./archiveTask.js";
+
 export const COMMAND_CONFIG = {
+	[ARCHIVE_TASK]: {
+		executionFn: archiveTask,
+		commandBuilder: archiveTaskCommand,
+		aliases: []
+	},
 	[ADD_TASK]: {
 		executionFn: addTask,
 		commandBuilder: addTaskCommand,
@@ -87,7 +98,7 @@ export const COMMAND_CONFIG = {
 	[TAG_ADD]: {
 		executionFn: tagAdd,
 		commandBuilder: tagAddCommand,
-		aliases: ['ta']
+		aliases: []
 	},
 	[UNPLAN]: {
 		executionFn: unplanTask,
@@ -108,7 +119,7 @@ export const registerCommands = async () => {
 	// Build alias command JSON (copy of primary with name swapped)
 	const aliasCommands = Object.values(COMMAND_CONFIG).flatMap(config => {
 		const baseJson = config.commandBuilder.toJSON();
-		return config.aliases.map(alias => ({ ...baseJson, name: alias }));
+		return (config.aliases ?? []).map(alias => ({ ...baseJson, name: alias }));
 	});
 
 	const rest = new REST({ version: '10' }).setToken(CONFIG.BOT_TOKEN);
