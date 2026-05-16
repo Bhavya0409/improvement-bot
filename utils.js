@@ -75,8 +75,8 @@ const doesTaskHaveTag = (task, tag) => {
 export const isPlanTask = (task) => doesTaskHaveTag(task, 'plan');
 export const isArchivedTask = (task) => doesTaskHaveTag(task, 'archive');
 export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationContent) => {
-	const planTasks = tasks.filter(t => isPlanTask(t));
-	const regularTasks = tasks.filter(t => !isPlanTask(t));
+	const planTasks = tasks.filter(t => isPlanTask(t) && !isArchivedTask(t));
+	const regularTasks = tasks.filter(t => !isPlanTask(t) && !isArchivedTask(t));
 	const archivedTasks = tasks.filter(t => isArchivedTask(t));
 
 	const fields = [];
