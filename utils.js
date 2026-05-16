@@ -162,7 +162,7 @@ export const getTasks = async () => {
 			: task.createdAt
 	);
 
-	allTasks.sort((a, b) => getSortDate(a) - getSortDate(b));
+	allTasks.sort((a, b) => getSortDate(b) - getSortDate(a));
 
 	const [planTasks, nonPlanTasks] = allTasks.reduce((acc, task) => {
 		acc[isPlanTask(task) ? 0 : 1].push(task);
