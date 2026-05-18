@@ -1,7 +1,9 @@
-import {isArchivedTask, isPlanTask} from "./taskUtils.js";
 import {EmbedBuilder} from "discord.js";
+
 import {TAGS} from "./constants.js";
 import {Tag, Task} from "../db/models/index.js";
+
+import {isArchivedTask, isPlanTask} from "./taskUtils.js";
 import {calculateAge, getAgeWithColor} from "./embedUtils.js";
 import {capitalizeFirstLetter} from "./baseUtils.js";
 
