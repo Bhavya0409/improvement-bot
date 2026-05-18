@@ -1,23 +1,36 @@
 'use strict';
 
+const {TAGS} = require("../utils/constants.js");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert('tags', [
+			{
+				value: TAGS.ARCHIVE,
+				displayValue: 'Archive',
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
       {
-        value: 'bot',
+        value: TAGS.BOT,
         displayValue: 'Bot',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        value: 'buy',
+        value: TAGS.BUY,
         displayValue: 'Buy',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+			{
+				value: TAGS.CAR,
+				displayValue: 'Car',
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
       {
-        value: 'plan',
+        value: TAGS.PLAN,
         displayValue: 'Plan',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -27,7 +40,7 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('tags', {
-      value: ['bot', 'buy', 'plan'],
+      value: [TAGS.BOT, TAGS.CAR, TAGS.BUY, TAGS.PLAN, TAGS.ARCHIVE],
     });
   }
 };

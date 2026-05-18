@@ -1,7 +1,7 @@
 import {SlashCommandBuilder} from "discord.js";
 import {Task} from "../db/models/index.js";
 import {EDIT_TASK} from "./commandNames.js";
-import {getTasks, sendRemainingTasksEmbed} from "../utils.js";
+import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
 
 const editTaskCommand = new SlashCommandBuilder()
 	.setName(EDIT_TASK)

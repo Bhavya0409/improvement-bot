@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 import { Task, Instance } from "../db/models/index.js";
 import { REFRESH } from "./commandNames.js";
-import { getTasks, sendRemainingTasksEmbed } from "../utils.js";
+import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
 
 const refreshTaskCommand = new SlashCommandBuilder()
 	.setName(REFRESH)

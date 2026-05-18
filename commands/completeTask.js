@@ -1,7 +1,7 @@
 import {SlashCommandBuilder} from "discord.js";
 import {Task} from "../db/models/index.js";
 import {COMPLETE_TASK} from "./commandNames.js";
-import {getTasks, sendRemainingTasksEmbed} from "../utils.js";
+import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
 
 const completeTaskCommand = new SlashCommandBuilder()
 	.setName(COMPLETE_TASK)

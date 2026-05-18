@@ -1,6 +1,9 @@
 import {EmbedBuilder, SlashCommandBuilder} from "discord.js";
 import {RANDOM} from "./commandNames.js";
-import {getTasks, getAgeWithColor, capitalizeFirstLetter, isPlanTask} from "../utils.js";
+import {getTasks} from "../utils/discordUtils.js";
+import {isPlanTask} from "../utils/taskUtils.js";
+import {capitalizeFirstLetter} from "../utils/baseUtils.js";
+import {getAgeWithColor} from "../utils/embedUtils.js";
 
 const randomTaskCommand = new SlashCommandBuilder()
 	.setName(RANDOM)

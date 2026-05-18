@@ -1,6 +1,6 @@
 import {SlashCommandBuilder} from "discord.js";
 import {LIST_ACTIVE_TASKS} from "./commandNames.js";
-import {getTasks, sendRemainingTasksEmbed} from "../utils.js";
+import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
 
 const listActiveTasksCommand = new SlashCommandBuilder()
 	.setName(LIST_ACTIVE_TASKS)

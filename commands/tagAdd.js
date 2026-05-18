@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { Tag } from '../db/models/index.js';
 import { TAG_ADD } from './commandNames.js';
-import { capitalizeFirstLetter, getTasks, sendRemainingTasksEmbed } from '../utils.js';
+import {capitalizeFirstLetter} from "../utils/baseUtils.js";
 
 const tagAddCommand = new SlashCommandBuilder()
 	.setName(TAG_ADD)

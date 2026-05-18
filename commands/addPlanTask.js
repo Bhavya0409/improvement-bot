@@ -1,7 +1,8 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { Tag, Task, TaskTag } from '../db/models/index.js';
 import { ADD_PLAN } from './commandNames.js';
-import { getTasks, sendRemainingTasksEmbed } from '../utils.js';
+
+import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
 
 const addPlanTaskCommand = new SlashCommandBuilder()
 	.setName(ADD_PLAN)
