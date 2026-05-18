@@ -7,7 +7,7 @@ const listActiveTasksCommand = new SlashCommandBuilder()
 	.setName(LIST_ACTIVE_TASKS)
 	.setDescription('View all active tasks')
 	.addStringOption(option =>
-		option.setName('listtype')
+		option.setName('tag')
 			.setDescription('Filter tasks by tag')
 			.setAutocomplete(true)
 			.setRequired(false)
@@ -16,14 +16,14 @@ const listActiveTasksCommand = new SlashCommandBuilder()
 
 const listActiveTasks = async (interaction) => {
 	try {
-		const listType = interaction.options.getString('listtype');
+		const tagFilter = interaction.options.getString('tag');
 
-		// Validate listType if provided
-		if (listType) {
-			const matchedTag = await Tag.findOne({ where: { value: listType } });
+		// Validate tagFilter if provided
+		if (tagFilter) {
+			const matchedTag = await Tag.findOne({ where: { value: tagFilter } });
 			if (!matchedTag) {
 				return await interaction.reply({
-					content: `❌ No tag found matching **${listType}**. Please choose a valid tag.`,
+					content: `❌ No tag found matching **${tagFilter}**. Please choose a valid tag.`,
 					ephemeral: true,
 				});
 			}
@@ -31,19 +31,19 @@ const listActiveTasks = async (interaction) => {
 
 		// Retrieve all non-completed tasks ordered from oldest to newest
 		const allTasks = await getTasks();
-		const tasks = listType
-			? allTasks.filter(t => t.tags?.some(tag => tag.value === listType))
+		const tasks = tagFilter
+			? allTasks.filter(t => t.tags?.some(tag => tag.value === tagFilter))
 			: allTasks;
 
 		// If no tasks, reply with a simple message
 		if (tasks.length === 0) {
 			return await interaction.reply({
-				content: listType ? `✅ No tasks found tagged with **${listType}**!` : '✅ No pending tasks!',
+				content: tagFilter ? `✅ No tasks found tagged with **${tagFilter}**!` : '✅ No pending tasks!',
 			});
 		}
 
-		const confirmationContent = listType
-			? `📋 Showing tasks tagged with **${listType}**`
+		const confirmationContent = tagFilter
+			? `📋 Showing tasks tagged with **${tagFilter}**`
 			: null;
 
 		await sendRemainingTasksEmbed(interaction, tasks, confirmationContent)
