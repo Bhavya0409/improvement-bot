@@ -3,7 +3,7 @@ import {CONFIG} from "./config.js";
 import sequelize from "./db/index.js";
 import {COMMAND_CONFIG, registerCommands} from "./commands/index.js";
 import {Task, Tag, TaskTag} from "./db/models/index.js";
-import {TAG, ADD_TASK, EDIT_TASK, UNTAG, PLAN, UNPLAN} from "./commands/commandNames.js";
+import {TAG, ADD_TASK, EDIT_TASK, UNTAG, PLAN, UNPLAN, LIST_ACTIVE_TASKS} from "./commands/commandNames.js";
 import {Op} from "sequelize";
 
 const CLIENT = new Client({
@@ -114,6 +114,15 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
 			const taskTags = await TaskTag.findAll({ where: { task_id: taskId }, include: [{ model: Tag, as: 'tag' }] });
 			const choices = taskTags
 				.map(tt => ({ name: tt.tag.displayValue, value: tt.tag.value }))
+				.filter(c => c.name.toLowerCase().includes(focusedValue.toLowerCase()));
+			return await interaction.respond(choices.slice(0, 25));
+		}
+
+		// listType autocomplete for /list: all tags
+		if (focusedOption.name === 'listtype' && resolvedCommandName === LIST_ACTIVE_TASKS) {
+			const tags = await Tag.findAll();
+			const choices = tags
+				.map(t => ({ name: t.displayValue, value: t.value }))
 				.filter(c => c.name.toLowerCase().includes(focusedValue.toLowerCase()));
 			return await interaction.respond(choices.slice(0, 25));
 		}
