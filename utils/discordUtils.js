@@ -3,18 +3,22 @@ import {EmbedBuilder} from "discord.js";
 import {TAGS} from "./constants.js";
 import {Tag, Task} from "../db/models/index.js";
 
-import {isArchivedTask, isPlanTask} from "./taskUtils.js";
+import {isArchivedTask, isPlanTask, prependTask} from "./taskUtils.js";
 import {calculateAge, getAgeWithColor} from "./embedUtils.js";
 import {capitalizeFirstLetter} from "./baseUtils.js";
 
 const embedConfig = {
-	plan: {
+	[TAGS.PLAN]: {
 		ageMapFn: () => '🤔',
 		descriptionName: 'Planned Tasks'
 	},
-	archive: {
+	[TAGS.ARCHIVE]: {
 		ageMapFn: t => calculateAge(t.createdAt, t.lastCompletedAt),
 		descriptionName: 'Archived Tasks'
+	},
+	[TAGS.BUY]: {
+		ageMapFn: () => '\u200B',
+		descriptionName: 'Items to Buy'
 	},
 	default: {
 		ageMapFn: t => getAgeWithColor(t.createdAt, t.lastCompletedAt),
@@ -22,18 +26,6 @@ const embedConfig = {
 	}
 }
 
-const prependTask = (taskDescription, tags, shouldPrepend = false) => {
-	if (!shouldPrepend) return taskDescription
-	const hasTag = (tagValue) => tags.some(t => t.value === tagValue);
-	if (hasTag(TAGS.BOT)) {
-		return `[BOT] - ${taskDescription}`;
-	} else if (hasTag(TAGS.BUY)) {
-		return `[BUY] - ${taskDescription}`;
-	} else if (hasTag(TAGS.CAR)) {
-		return `[CAR] - ${taskDescription}`;
-	}
-	return taskDescription
-}
 const pushToFields = (fields, tasks, sectionTag = 'default') => {
 	// If fields or tasks is not passed in OR if tasks is an empty array, do nothing
 	if (!fields || !tasks || tasks.length === 0) return
@@ -41,7 +33,7 @@ const pushToFields = (fields, tasks, sectionTag = 'default') => {
 	
 	const ages = tasks.map(ageMapFn);
 	const spacer = tasks.map(() => '\u200B')
-	const descriptions = tasks.map(t => prependTask(capitalizeFirstLetter(t.value), t.tags, true))
+	const descriptions = tasks.map(task => prependTask(task))
 	
 	ages.push('--------');
 	spacer.push('-----');
@@ -74,6 +66,7 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 	// Create individual embed sections for each task section
 	pushToFields(fields, plannedTasks, TAGS.PLAN)
 	pushToFields(fields, archivedTasks, TAGS.ARCHIVE)
+	pushToFields(fields, archivedTasks, TAGS.BUY)
 	pushToFields(fields, regularTasks)
 	
 	// Set up embed values
