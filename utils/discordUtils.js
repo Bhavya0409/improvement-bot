@@ -3,7 +3,7 @@ import {EmbedBuilder} from "discord.js";
 import {TAGS} from "./constants.js";
 import {Tag, Task} from "../db/models/index.js";
 
-import {isArchivedTask, isPlanTask, prependTask} from "./taskUtils.js";
+import {isArchivedTask, isBuyTask, isPlanTask, prependTask} from "./taskUtils.js";
 import {calculateAge, getAgeWithColor} from "./embedUtils.js";
 import {capitalizeFirstLetter} from "./baseUtils.js";
 
@@ -50,6 +50,7 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 	const plannedTasks = []
 	const archivedTasks = []
 	const regularTasks = []
+	const buyTasks = []
 	const fields = [];
 	
 	// Partition tasks for the different sections
@@ -58,6 +59,8 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 			archivedTasks.push(task)
 		} else if (isPlanTask(task)) {
 			plannedTasks.push(task)
+		} else if (isBuyTask(task)) {
+			buyTasks.push(task)
 		} else {
 			regularTasks.push(task)
 		}
@@ -66,7 +69,7 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 	// Create individual embed sections for each task section
 	pushToFields(fields, plannedTasks, TAGS.PLAN)
 	pushToFields(fields, archivedTasks, TAGS.ARCHIVE)
-	pushToFields(fields, archivedTasks, TAGS.BUY)
+	pushToFields(fields, buyTasks, TAGS.BUY)
 	pushToFields(fields, regularTasks)
 	
 	// Set up embed values
