@@ -22,14 +22,26 @@ const embedConfig = {
 	}
 }
 
-const pushToFields = (fields, tasks, tag = 'default') => {
+const prependTask = (taskDescription, tags, shouldPrepend = false) => {
+	if (!shouldPrepend) return taskDescription
+	const hasTag = (tagValue) => tags.some(t => t.value === tagValue);
+	if (hasTag(TAGS.BOT)) {
+		return `[BOT] - ${taskDescription}`;
+	} else if (hasTag(TAGS.BUY)) {
+		return `[BUY] - ${taskDescription}`;
+	} else if (hasTag(TAGS.CAR)) {
+		return `[CAR] - ${taskDescription}`;
+	}
+	return taskDescription
+}
+const pushToFields = (fields, tasks, sectionTag = 'default') => {
 	// If fields or tasks is not passed in OR if tasks is an empty array, do nothing
 	if (!fields || !tasks || tasks.length === 0) return
-	const {ageMapFn, descriptionName = 'Tasks', ageName = '\u200B'} = embedConfig[tag]
+	const {ageMapFn, descriptionName = 'Tasks', ageName = '\u200B'} = embedConfig[sectionTag]
 	
 	const ages = tasks.map(ageMapFn);
 	const spacer = tasks.map(() => '\u200B')
-	const descriptions = tasks.map(t => capitalizeFirstLetter(t.value))
+	const descriptions = tasks.map(t => prependTask(capitalizeFirstLetter(t.value), t.tags, true))
 	
 	ages.push('--------');
 	spacer.push('-----');
