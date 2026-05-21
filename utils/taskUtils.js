@@ -7,6 +7,10 @@ export const doesTaskHaveTag = (task, tag) => {
 export const isPlanTask = (task) => doesTaskHaveTag(task, TAGS.PLAN);
 export const isArchivedTask = (task) => doesTaskHaveTag(task, TAGS.ARCHIVE);
 export const isBuyTask = (task) => doesTaskHaveTag(task, TAGS.BUY);
+export const isDeferredTask = (task) => {
+	if (!task.startDate) return false;
+	return new Date(task.startDate) > new Date();
+};
 export const prependTask = (task) => {
 	const taskDescription = capitalizeFirstLetter(task.value)
 	if (doesTaskHaveTag(task, TAGS.BOT)) {

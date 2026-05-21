@@ -20,12 +20,20 @@ const addTaskCommand = new SlashCommandBuilder()
 			.setRequired(false)
 			.setAutocomplete(true)
 	)
+	.addIntegerOption(option =>
+		option
+			.setName('delay')
+			.setDescription('Number of days to defer this task before it becomes active')
+			.setRequired(false)
+			.setMinValue(1)
+	)
 
 
 const addTask =  async (interaction) => {
 	try {
 		const taskDescription = interaction.options.getString('task').trim();
 		const tagValue = interaction.options.getString('tag');
+		const delay = interaction.options.getInteger('delay');
 		
 		// Validate task is not empty after trimming
 		if (!taskDescription) {
@@ -63,9 +71,12 @@ const addTask =  async (interaction) => {
 		}
 		
 		// Create the improvement record
+		const now = new Date();
+		const startDate = delay ? new Date(now.getTime() + delay * 24 * 60 * 60 * 1000) : null;
 		const improvement = await Task.create({
 			value: taskDescription,
 			completed: false,
+			startDate,
 		});
 		
 		// Link tag if provided

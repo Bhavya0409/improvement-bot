@@ -3,7 +3,7 @@ import {EmbedBuilder} from "discord.js";
 import {TAGS} from "./constants.js";
 import {Tag, Task} from "../db/models/index.js";
 
-import {isArchivedTask, isBuyTask, isPlanTask, prependTask} from "./taskUtils.js";
+import {isArchivedTask, isBuyTask, isDeferredTask, isPlanTask, prependTask} from "./taskUtils.js";
 import {calculateAge, getAgeWithColor} from "./embedUtils.js";
 import {capitalizeFirstLetter} from "./baseUtils.js";
 
@@ -19,6 +19,10 @@ const embedConfig = {
 	[TAGS.BUY]: {
 		ageMapFn: () => '\u200B',
 		descriptionName: 'Items to Buy'
+	},
+	deferred: {
+		ageMapFn: () => '⚪',
+		descriptionName: 'Deferred Tasks'
 	},
 	default: {
 		ageMapFn: t => getAgeWithColor(t.createdAt, t.lastCompletedAt),
@@ -49,6 +53,7 @@ const pushToFields = (fields, tasks, sectionTag = 'default') => {
 export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationContent) => {
 	const plannedTasks = []
 	const archivedTasks = []
+	const deferredTasks = []
 	const regularTasks = []
 	const buyTasks = []
 	const fields = [];
@@ -59,6 +64,8 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 			archivedTasks.push(task)
 		} else if (isPlanTask(task)) {
 			plannedTasks.push(task)
+		} else if (isDeferredTask(task)) {
+			deferredTasks.push(task)
 		} else if (isBuyTask(task)) {
 			buyTasks.push(task)
 		} else {
@@ -66,9 +73,12 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 		}
 	})
 	
+	deferredTasks.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+	
 	// Create individual embed sections for each task section
 	pushToFields(fields, plannedTasks, TAGS.PLAN)
 	pushToFields(fields, archivedTasks, TAGS.ARCHIVE)
+	pushToFields(fields, deferredTasks, 'deferred')
 	pushToFields(fields, buyTasks, TAGS.BUY)
 	pushToFields(fields, regularTasks)
 	

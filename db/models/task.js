@@ -27,6 +27,11 @@ export default (sequelize) => {
 			allowNull: true,
 			defaultValue: null,
 		},
+		startDate: {
+			type: DataTypes.DATE,
+			allowNull: true,
+			defaultValue: null,
+		},
 	}, {
 		sequelize,
 		modelName: 'Task',

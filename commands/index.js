@@ -5,44 +5,20 @@ import {
 	ARCHIVE_TASK
 } from "./commandNames.js";
 
-// Add Command
 import {addTask, addTaskCommand} from './addTask.js'
-
-// Add Plan Task Command
-import {addPlanTask, addPlanTaskCommand} from './addPlanTask.js'
-
-// Complete Task Command
 import {completeTask, completeTaskCommand} from './completeTask.js'
-
-// Edit Task Command
 import {editTask, editTaskCommand} from './editTask.js'
-
-// List Active Tasks Command
 import {listActiveTasks, listActiveTasksCommand} from './listActiveTasks.js'
-
-// Plan Task Command
-import {planTask, planTaskCommand} from './planTask.js'
-
-// Random Task Command
 import {randomTask, randomTaskCommand} from './randomTask.js'
-
-// Refresh Task Command
 import {refreshTask, refreshTaskCommand} from './refreshTask.js'
-
-// Tag Command
-import {addTag, addTagCommand} from './tag.js'
-
-// Tag Add Command
-import {tagAdd, tagAddCommand} from './tagAdd.js'
-
-// Unplan Task Command
-import {unplanTask, unplanTaskCommand} from './unplanTask.js'
-
-// Untag Command
-import {removeTag, removeTagCommand} from './untag.js'
-
-// Archive Task Command
 import {archiveTask, archiveTaskCommand} from "./archiveTask.js";
+
+import {addPlanTask, addPlanTaskCommand} from './addPlanTask.js'
+import {planTask, planTaskCommand} from './planTask.js'
+import {unplanTask, unplanTaskCommand} from './unplanTask.js'
+import {addTag, addTagCommand} from './tag.js'
+import {tagAdd, tagAddCommand} from './tagAdd.js'
+import {removeTag, removeTagCommand} from './untag.js'
 
 export const COMMAND_CONFIG = {
 	[ARCHIVE_TASK]: {

@@ -16,16 +16,25 @@ const editTaskCommand = new SlashCommandBuilder()
 	.addStringOption(option =>
 		option
 			.setName('new_description')
-			.setDescription('The new description for the task')
-			.setRequired(true)
+			.setDescription('The new description for the task (omit to keep existing)')
+			.setRequired(false)
 			.setMaxLength(100)
+	)
+	.addIntegerOption(option =>
+		option
+			.setName('delay')
+			.setDescription('Days to defer task (0 to clear existing deferral, omit to leave unchanged)')
+			.setRequired(false)
+			.setMinValue(0)
 	)
 
 
 const editTask = async (interaction) => {
 	try {
 		const selectedTask = interaction.options.getString('task').trim();
-		const newDescription = interaction.options.getString('new_description').trim();
+		const newDescriptionInput = interaction.options.getString('new_description');
+		const newDescription = newDescriptionInput ? newDescriptionInput.trim() : null;
+		const delay = interaction.options.getInteger('delay');
 		
 		// Validate selected task is not empty after trimming
 		if (!selectedTask) {
@@ -33,9 +42,9 @@ const editTask = async (interaction) => {
 				content: '❌ Task selection cannot be empty.',
 			});
 		}
-		
-		// Validate new description is not empty after trimming
-		if (!newDescription) {
+
+		// Validate new description is not empty if provided
+		if (newDescriptionInput !== null && !newDescription) {
 			return await interaction.reply({
 				content: '❌ New description cannot be empty.',
 			});
@@ -59,13 +68,21 @@ const editTask = async (interaction) => {
 		// Store old description for confirmation message
 		const oldDescription = improvement.value;
 		
-		// Update the task description
-		await improvement.update({
-			value: newDescription
-		});
+		// Update the task
+		const updatePayload = { value: newDescription ?? improvement.value };
+		if (delay === 0) {
+			updatePayload.startDate = null;
+		} else if (delay > 0) {
+			const now = new Date();
+			updatePayload.startDate = new Date(now.getTime() + delay * 24 * 60 * 60 * 1000);
+		}
+		await improvement.update(updatePayload);
 		
 		// Send success reply with confirmation
-		const confirmationContent = `✅ Task '#${improvement.id} - ${oldDescription}' has been updated to '${newDescription}'!`;
+		const updatedDescription = newDescription ?? oldDescription;
+		const confirmationContent = newDescription
+			? `✅ Task '#${improvement.id} - ${oldDescription}' has been updated to '${updatedDescription}'!`
+			: `✅ Task '#${improvement.id} - ${oldDescription}' has been updated!`;
 		
 		// Retrieve remaining active tasks
 		const remainingTasks = await getTasks();
