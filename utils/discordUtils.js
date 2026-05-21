@@ -25,7 +25,7 @@ const embedConfig = {
 		descriptionName: 'Deferred Tasks'
 	},
 	default: {
-		ageMapFn: t => getAgeWithColor(t.createdAt, t.lastCompletedAt),
+		ageMapFn: t => getAgeWithColor(t.createdAt, t.lastCompletedAt, t.startDate),
 		ageName: 'Age',
 	}
 }

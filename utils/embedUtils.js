@@ -1,8 +1,10 @@
-export const calculateAge = (createdAt, lastCompletedAt) => {
-	// Prioritize lastCompletedAt if it exists
-	const referenceDate = lastCompletedAt && new Date(lastCompletedAt) > new Date(createdAt)
-		? new Date(lastCompletedAt)
-		: new Date(createdAt);
+export const calculateAge = (createdAt, lastCompletedAt, startDate) => {
+	// Use startDate if it exists, otherwise prioritize lastCompletedAt
+	const referenceDate = startDate
+		? new Date(startDate)
+		: lastCompletedAt && new Date(lastCompletedAt) > new Date(createdAt)
+			? new Date(lastCompletedAt)
+			: new Date(createdAt);
 	
 	const now = new Date();
 	const diffInMilliseconds = now - referenceDate;
@@ -29,11 +31,13 @@ export const calculateAge = (createdAt, lastCompletedAt) => {
 	// 1 day or more
 	return `${diffInDays}d`;
 };
-export const getColorCircle = (createdAt, lastCompletedAt) => {
-	// Prioritize lastCompletedAt if it exists
-	const referenceDate = lastCompletedAt && new Date(lastCompletedAt) > new Date(createdAt)
-		? new Date(lastCompletedAt)
-		: new Date(createdAt);
+export const getColorCircle = (createdAt, lastCompletedAt, startDate) => {
+	// Use startDate if it exists, otherwise prioritize lastCompletedAt
+	const referenceDate = startDate
+		? new Date(startDate)
+		: lastCompletedAt && new Date(lastCompletedAt) > new Date(createdAt)
+			? new Date(lastCompletedAt)
+			: new Date(createdAt);
 	
 	const now = new Date();
 	const diffInMilliseconds = now - referenceDate;
@@ -58,8 +62,8 @@ export const getColorCircle = (createdAt, lastCompletedAt) => {
 	// 🔴 7+ days
 	return '🔴';
 };
-export const getAgeWithColor = (createdAt, lastCompletedAt) => {
-	const colorCircle = getColorCircle(createdAt, lastCompletedAt);
-	const age = calculateAge(createdAt, lastCompletedAt);
+export const getAgeWithColor = (createdAt, lastCompletedAt, startDate) => {
+	const colorCircle = getColorCircle(createdAt, lastCompletedAt, startDate);
+	const age = calculateAge(createdAt, lastCompletedAt, startDate);
 	return `${colorCircle} ${age}`;
 };
