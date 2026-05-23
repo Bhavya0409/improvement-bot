@@ -1,47 +1,47 @@
 import {EmbedBuilder} from "discord.js";
 
-import {TAGS} from "./constants.js";
+import {SECTIONS} from "./constants.js";
 import {Tag, Task} from "../db/models/index.js";
 
 import {isArchivedTask, isBuyTask, isDeferredTask, isPlanTask, prependTask} from "./taskUtils.js";
-import {calculateAge, getAgeWithColor} from "./embedUtils.js";
+import {calculateAge, getAgeWithColor, getDeferredTaskAgeWithColor} from "./embedUtils.js";
 import {capitalizeFirstLetter} from "./baseUtils.js";
 
 const embedConfig = {
-	[TAGS.PLAN]: {
+	[SECTIONS.PLANNED]: {
 		ageMapFn: () => '🤔',
 		descriptionName: 'Planned Tasks'
 	},
-	[TAGS.ARCHIVE]: {
-		ageMapFn: t => calculateAge(t.createdAt, t.lastCompletedAt),
+	[SECTIONS.ARCHIVED]: {
+		ageMapFn: calculateAge,
 		descriptionName: 'Archived Tasks'
 	},
-	[TAGS.BUY]: {
+	[SECTIONS.BUY]: {
 		ageMapFn: () => '\u200B',
 		descriptionName: 'Items to Buy'
 	},
-	deferred: {
-		ageMapFn: () => '⚪',
+	[SECTIONS.DEFERRED]: {
+		ageMapFn: getDeferredTaskAgeWithColor,
 		descriptionName: 'Deferred Tasks'
 	},
-	default: {
-		ageMapFn: t => getAgeWithColor(t.createdAt, t.lastCompletedAt, t.startDate),
+	[SECTIONS.DEFAULT]: {
+		ageMapFn: getAgeWithColor,
 		ageName: 'Age',
 	}
 }
-
-const pushToFields = (fields, tasks, sectionTag = 'default') => {
+const addSectionToFields = (fields, section, unsortedTasks) => {
 	// If fields or tasks is not passed in OR if tasks is an empty array, do nothing
-	if (!fields || !tasks || tasks.length === 0) return
-	const {ageMapFn, descriptionName = 'Tasks', ageName = '\u200B'} = embedConfig[sectionTag]
+	if (!unsortedTasks || unsortedTasks.length === 0) return
+	const {ageMapFn, descriptionName = 'Tasks', ageName = '\u200B'} = embedConfig[section]
+	const tasks = unsortedTasks.sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate))
 	
 	const ages = tasks.map(ageMapFn);
 	const spacer = tasks.map(() => '\u200B')
 	const descriptions = tasks.map(task => prependTask(task))
 	
-	ages.push('--------');
+	ages.push('----------');
 	spacer.push('-----');
-	descriptions.push('---------------------------------------------------------------------');
+	descriptions.push('------------------------------------------------------------------');
 	
 	fields.push(
 		{ name: ageName, value: ages.join('\n'), inline: true },
@@ -50,7 +50,7 @@ const pushToFields = (fields, tasks, sectionTag = 'default') => {
 	);
 }
 
-export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationContent) => {
+export const sendTasksEmbed = async (interaction, tasks, confirmationContent) => {
 	const plannedTasks = []
 	const archivedTasks = []
 	const deferredTasks = []
@@ -72,21 +72,18 @@ export const sendRemainingTasksEmbed = async (interaction, tasks, confirmationCo
 			regularTasks.push(task)
 		}
 	})
-	
-	deferredTasks.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
-	
-	// Create individual embed sections for each task section
-	pushToFields(fields, plannedTasks, TAGS.PLAN)
-	pushToFields(fields, archivedTasks, TAGS.ARCHIVE)
-	pushToFields(fields, deferredTasks, 'deferred')
-	pushToFields(fields, buyTasks, TAGS.BUY)
-	pushToFields(fields, regularTasks)
-	
+
+	addSectionToFields(fields, SECTIONS.PLANNED, plannedTasks)
+	addSectionToFields(fields, SECTIONS.ARCHIVED, archivedTasks)
+	addSectionToFields(fields, SECTIONS.DEFERRED, deferredTasks)
+	addSectionToFields(fields, SECTIONS.BUY, buyTasks)
+	addSectionToFields(fields, SECTIONS.DEFAULT, regularTasks)
+
 	// Set up embed values
 	const descriptionFieldLength = regularTasks.map(t => capitalizeFirstLetter(t.value)).join('\n').length
 	const charsLeft = 1024 - descriptionFieldLength;
 	const embedColor = charsLeft < 100 ? '#C0392B' : charsLeft < 300 ? '#D4AC0D' : '#1E8449';
-	
+
 	const embed = new EmbedBuilder()
 		.setColor(embedColor)
 		.setTitle(`TASK LIST (${tasks.length})`)
@@ -111,6 +108,7 @@ export const getTasks = async () => {
 	const allTasks = await Task.findAll({
 		where: { completed: false },
 		include: [{ model: Tag, as: 'tags' }],
+		order: [['createdAt', 'ASC']],
 	});
 	
 	const getSortDate = (task) => new Date(

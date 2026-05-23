@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import { Tag, Task, TaskTag } from '../db/models/index.js';
 import { ADD_PLAN } from './commandNames.js';
 
-import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
+import {getTasks, sendTasksEmbed} from "../utils/discordUtils.js";
 
 const addPlanTaskCommand = new SlashCommandBuilder()
 	.setName(ADD_PLAN)
@@ -55,7 +55,7 @@ const addPlanTask = async (interaction) => {
 		const allTasks = await getTasks();
 
 		const confirmationContent = `📋 Task '${task.value}' added and marked as planned!`;
-		await sendRemainingTasksEmbed(interaction, allTasks, confirmationContent);
+		await sendTasksEmbed(interaction, allTasks, confirmationContent);
 	} catch (error) {
 		console.error('Error in addplan command:', error);
 		await interaction.reply({

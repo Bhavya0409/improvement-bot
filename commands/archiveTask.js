@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { Tag, Task, TaskTag } from '../db/models/index.js';
 import { ARCHIVE_TASK } from './commandNames.js';
-import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
+import {getTasks, sendTasksEmbed} from "../utils/discordUtils.js";
 
 const archiveTaskCommand = new SlashCommandBuilder()
 	.setName(ARCHIVE_TASK)
@@ -55,7 +55,7 @@ const archiveTask = async (interaction) => {
 		const allTasks = await getTasks();
 
 		const confirmationContent = `📋 Task '${task.value}' has been marked as archived!`;
-		await sendRemainingTasksEmbed(interaction, allTasks, confirmationContent);
+		await sendTasksEmbed(interaction, allTasks, confirmationContent);
 	} catch (error) {
 		console.error('Error in plan command:', error);
 		await interaction.reply({

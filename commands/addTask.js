@@ -1,7 +1,7 @@
 import {SlashCommandBuilder} from "discord.js";
 import {Tag, Task, TaskTag} from "../db/models/index.js";
 import {ADD_TASK} from "./commandNames.js";
-import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
+import {getTasks, sendTasksEmbed} from "../utils/discordUtils.js";
 
 const addTaskCommand = new SlashCommandBuilder()
 	.setName(ADD_TASK)
@@ -98,7 +98,7 @@ const addTask =  async (interaction) => {
 			});
 		}
 		
-		await sendRemainingTasksEmbed(interaction, allTasks, confirmationContent)
+		await sendTasksEmbed(interaction, allTasks, confirmationContent)
 	} catch (error) {
 		console.error('Error in add command:', error);
 		await interaction.reply({

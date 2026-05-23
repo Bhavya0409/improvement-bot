@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { Tag, Task, TaskTag } from '../db/models/index.js';
 import { UNTAG } from './commandNames.js';
-import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
+import {getTasks, sendTasksEmbed} from "../utils/discordUtils.js";
 
 const removeTagCommand = new SlashCommandBuilder()
 	.setName(UNTAG)
@@ -64,7 +64,7 @@ const removeTag = async (interaction) => {
 		const allTasks = await getTasks();
 
 		const confirmationContent = `✅ Tag '${tag.displayValue}' removed from task '${task.value}'!`;
-		await sendRemainingTasksEmbed(interaction, allTasks, confirmationContent);
+		await sendTasksEmbed(interaction, allTasks, confirmationContent);
 	} catch (error) {
 		console.error('Error in removetag command:', error);
 		await interaction.reply({

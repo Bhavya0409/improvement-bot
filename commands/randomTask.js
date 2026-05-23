@@ -28,7 +28,7 @@ const randomTask = async (interaction) => {
 		const randomTaskData = tasks[randomIndex];
 
 		// Build the three columns for the embed (single row)
-		const age = getAgeWithColor(randomTaskData.createdAt, randomTaskData.lastCompletedAt);
+		const age = getAgeWithColor(randomTaskData);
 		const id = randomTaskData.id.toString();
 		const taskDescription = capitalizeFirstLetter(randomTaskData.value);
 

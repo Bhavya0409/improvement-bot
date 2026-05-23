@@ -5,3 +5,10 @@ export const TAGS = {
 	CAR: 'car',
 	PLAN: 'plan'
 }
+export const SECTIONS = {
+	PLANNED: 'PLANNED_TASKS',
+	ARCHIVED: 'ARCHIVED_TASKS',
+	BUY: 'BUY_TASKS',
+	DEFERRED: 'DEFERRED_TASKS',
+	DEFAULT: 'REGULAR_TASKS'
+}

@@ -1,7 +1,7 @@
 import {SlashCommandBuilder} from "discord.js";
 import {Task} from "../db/models/index.js";
 import {COMPLETE_TASK} from "./commandNames.js";
-import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
+import {getTasks, sendTasksEmbed} from "../utils/discordUtils.js";
 
 const completeTaskCommand = new SlashCommandBuilder()
 	.setName(COMPLETE_TASK)
@@ -79,7 +79,7 @@ const completeTask = async (interaction) => {
 			});
 		}
 		
-		await sendRemainingTasksEmbed(interaction, remainingTasks, confirmationContent)
+		await sendTasksEmbed(interaction, remainingTasks, confirmationContent)
 	} catch (error) {
 		console.error('Error in complete command:', error);
 		await interaction.reply({

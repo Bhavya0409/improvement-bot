@@ -32,6 +32,14 @@ export default (sequelize) => {
 			allowNull: true,
 			defaultValue: null,
 		},
+		sortDate: {
+			type: DataTypes.VIRTUAL,
+			get: function() {
+				if (this.getDataValue('lastCompletedAt')) return this.getDataValue('lastCompletedAt');
+				if (this.getDataValue('startDate'))       return this.getDataValue('startDate');
+				return this.getDataValue('createdAt');
+			}
+		}
 	}, {
 		sequelize,
 		modelName: 'Task',

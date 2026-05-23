@@ -1,7 +1,7 @@
 import {SlashCommandBuilder} from "discord.js";
 import {Task} from "../db/models/index.js";
 import {EDIT_TASK} from "./commandNames.js";
-import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
+import {getTasks, sendTasksEmbed} from "../utils/discordUtils.js";
 
 const editTaskCommand = new SlashCommandBuilder()
 	.setName(EDIT_TASK)
@@ -94,7 +94,7 @@ const editTask = async (interaction) => {
 			});
 		}
 		
-		await sendRemainingTasksEmbed(interaction, remainingTasks, confirmationContent);
+		await sendTasksEmbed(interaction, remainingTasks, confirmationContent);
 	} catch (error) {
 		console.error('Error in edit command:', error);
 		try {

@@ -1,6 +1,6 @@
 import {SlashCommandBuilder} from "discord.js";
 import {LIST_ACTIVE_TASKS} from "./commandNames.js";
-import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
+import {getTasks, sendTasksEmbed} from "../utils/discordUtils.js";
 import {Tag} from "../db/models/index.js";
 
 const listActiveTasksCommand = new SlashCommandBuilder()
@@ -46,7 +46,7 @@ const listActiveTasks = async (interaction) => {
 			? `📋 Showing tasks tagged with **${tagFilter}**`
 			: null;
 
-		await sendRemainingTasksEmbed(interaction, tasks, confirmationContent)
+		await sendTasksEmbed(interaction, tasks, confirmationContent)
 
 	} catch (error) {
 		console.error('Error in list active tasks command:', error);

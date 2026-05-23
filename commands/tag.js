@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { Tag, Task, TaskTag } from '../db/models/index.js';
 import { TAG } from './commandNames.js';
-import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
+import {getTasks, sendTasksEmbed} from "../utils/discordUtils.js";
 
 const addTagCommand = new SlashCommandBuilder()
 	.setName(TAG)
@@ -65,7 +65,7 @@ const addTag = async (interaction) => {
 		const allTasks = await getTasks();
 
 		const confirmationContent = `✅ Tag '${tag.displayValue}' added to task '${task.value}'!`;
-		await sendRemainingTasksEmbed(interaction, allTasks, confirmationContent);
+		await sendTasksEmbed(interaction, allTasks, confirmationContent);
 	} catch (error) {
 		console.error('Error in addtag command:', error);
 		await interaction.reply({

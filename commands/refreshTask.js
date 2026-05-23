@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 import { Task, Instance } from "../db/models/index.js";
 import { REFRESH } from "./commandNames.js";
-import {getTasks, sendRemainingTasksEmbed} from "../utils/discordUtils.js";
+import {getTasks, sendTasksEmbed} from "../utils/discordUtils.js";
 
 const refreshTaskCommand = new SlashCommandBuilder()
 	.setName(REFRESH)
@@ -83,7 +83,7 @@ const refreshTask = async (interaction) => {
 			});
 		}
 		
-		await sendRemainingTasksEmbed(interaction, remainingTasks, confirmationContent)
+		await sendTasksEmbed(interaction, remainingTasks, confirmationContent)
 	} catch (error) {
 		console.error('Error in refresh command:', error);
 		await interaction.reply({
