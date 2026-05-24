@@ -5,6 +5,7 @@ export const doesTaskHaveTag = (task, tag) => {
 	return task.tags?.some(t => t.value === tag) ?? false;
 }
 export const isPlanTask = (task) => doesTaskHaveTag(task, TAGS.PLAN);
+export const isBotTask = (task) => doesTaskHaveTag(task, TAGS.BOT);
 export const isArchivedTask = (task) => doesTaskHaveTag(task, TAGS.ARCHIVE);
 export const isBuyTask = (task) => doesTaskHaveTag(task, TAGS.BUY);
 export const isDeferredTask = (task) => {
