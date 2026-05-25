@@ -82,9 +82,9 @@ export const sendTasksEmbed = async (interaction, tasks, confirmationContent) =>
 
 	addSectionToFields(fields, SECTIONS.PLANNED, plannedTasks)
 	addSectionToFields(fields, SECTIONS.ARCHIVED, archivedTasks)
+	addSectionToFields(fields, SECTIONS.BOT, botTasks)
 	addSectionToFields(fields, SECTIONS.DEFERRED, deferredTasks)
 	addSectionToFields(fields, SECTIONS.BUY, buyTasks)
-	addSectionToFields(fields, SECTIONS.BOT, botTasks)
 	addSectionToFields(fields, SECTIONS.DEFAULT, regularTasks)
 
 	// Set up embed values
