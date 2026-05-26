@@ -1,6 +1,7 @@
 export const ARCHIVE_TASK = 'archive'
 export const ADD_TASK = 'add'
 export const ADD_PLAN = 'addplan' // TODO rename to make more intuitive
+export const BUY = 'buy'
 export const COMPLETE_TASK = 'complete'
 export const EDIT_TASK = 'edit'
 export const LIST_ACTIVE_TASKS = 'list'
